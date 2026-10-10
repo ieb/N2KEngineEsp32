@@ -1,0 +1,2 @@
+#define GIT_SHA1_VERSION "9f086ffad0ef5f4a66772c682bdeb9b64379c6f9"
+#define GIT_LOCAL_CHANGES  2
