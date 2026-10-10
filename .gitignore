@@ -1,0 +1,10 @@
+.pio
+*-cnc
+*.gbr
+*-backups
+*.drl
+fp-info-cache
+*.dsn
+
+
+
