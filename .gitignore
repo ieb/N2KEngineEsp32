@@ -5,6 +5,7 @@
 *.drl
 fp-info-cache
 *.dsn
+src/version.h
 
 
 

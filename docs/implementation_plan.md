@@ -41,7 +41,7 @@ Implementation of the marine diesel engine monitoring system based on the ESP32-
 
 #### [NEW] [config.h](../src/config.h)
 - Centralized hardware definitions:
-  - GPIO pin numbers (CAN TX=3, RX=1, Flywheel=4, Stop=5, Start=6, Glow=7, SDA=8, SCL=9, 1-Wire=10)
+  - GPIO pin numbers (CAN TX=3, RX=1, Flywheel=4, Stop=5, Glow=6, Start=7, SDA=8, SCL=9, 1-Wire=0)
   - ADS1115 I2C addresses (0x48, 0x49, 0x4B)
   - Calibration constants, alarm thresholds, N2K device parameters.
 
@@ -59,10 +59,10 @@ Implementation of the marine diesel engine monitoring system based on the ESP32-
 - Tracks engine running ($\text{RPM} \ge 800$) and stopping ($\text{RPM} < 500$) states.
 
 #### [NEW] [DigitalInputs.h](../src/hal/DigitalInputs.h) & [DigitalInputs.cpp](../src/hal/DigitalInputs.cpp)
-- Reads Stop Relay Coil (GPIO5), Start Relay Coil (GPIO6), and Glow Relay Coil (GPIO7).
+- Reads Stop Relay Coil (GPIO5), Start Relay Coil (GPIO7), and Glow Relay Coil (GPIO6).
 
 #### [NEW] [OneWireTemp.h](../src/hal/OneWireTemp.h) & [OneWireTemp.cpp](../src/hal/OneWireTemp.cpp)
-- Scans and reads Dallas DS18B20 sensors on GPIO10.
+- Scans and reads Dallas DS18B20 sensors on GPIO0.
 
 ---
 

@@ -17,7 +17,7 @@ The curcuit is defined in pcb/esp32board/esp32board.kicad_sch
 		* AIN0 - NTC1 10K NTC  5V 4K7 Pullup
 		* AIN1 - NTC2 10K NTC  5V 4K7 Pullup
 		* AIN2 - NTC3 10K NTC  5V 4K7 Pullup
-		* AIN3 - Alternator Voltage Divider 10K/4K7
+		* AIN3 - Alternator Voltage Divider 10K/3K3 (to measure over voltage)
 	* ADC2 Address 1001001b (Addr pin Vdd)
 		* AIN0 - Oil Pressure 0-5V Sensor
 		* AIN1 - Coolant 12V 1K Pullup
@@ -26,26 +26,26 @@ The curcuit is defined in pcb/esp32board/esp32board.kicad_sch
 	* ADC3 Address 1001011b (Addr pin SCL)
 		* AIN0 - NTC4 10K NTC  5V 4K7 Pullup
 		* AIN1 - NTC5 10K NTC  5V 4K7 Pullup
-		* AIN2 - Fuel 10K NTC  5V 1K Pullup
+		* AIN2 - Fuel 10K Sender  5V 1K Pullup
 		* AIN3 - V sense, spare Voltage Divider 10K/4K7
 
-* Flywheel Pulse on GPIO4, 30 pulses per revolution
-* Stop Relay Coil 10K/2K2+LED Divider
-* Start Relay Coil 10K/2K2+LED Divider
-* Glow Relay Coil 10K/2K2+LED Divider
+* Flywheel Pulse on GPIO4, 30 pulses per revolution, see Flyweel sense
+* Stop Relay Coil 10K/2K2 Divider
+* Start Relay Coil 10K/2K2 Divider
+* Glow Relay Coil 10K/2K2 Divider
 * 1 Wire GPIO10
 
 ## GPIO Connections
 
+* GPI0  1 Wire
 * GPIO1 CAN-RX
 * GPIO3 CAN-TX
 * GPIO4 Flywheel Pulse
 * GPIO5 StopCoil
-* GPIO6 StartCoil
-* GPIO7 GlowCoil
+* GPIO6 GlowCoil
+* GPIO7 StartCoil
 * GPIO8 I2C SDA 
 * GPIO9 I2C SCL
-* GPI10 1 Wire
 
 ## ADC Voltage Dividers
 
@@ -58,6 +58,16 @@ The ADS1115 will be running at 64sps, giving a Nyquist frequency of 32Hz due to 
            10K
             |---- 2K2 --- ADC Pin
             4K7
+            |
+     0V -----
+
+12V Alternator
+
+    12V  ----
+            |
+           10K
+            |---- 2K2 --- ADC Pin
+            3K3
             |
      0V -----
 
@@ -76,10 +86,8 @@ Coils
     12V Coil ----
                 |
                 10K
-                | --- 2K2 --- ADC Pin
+                | ------ ESP32 Pins (3.6V max)
                 2k2
-                |
-                LED
                 |
      0V ---------
 
@@ -92,6 +100,15 @@ Engine Block - -ve relative to 0V
                 10K
                  |
     Engine Block -         
+
+Flyweel sense
+
+    Reactive Coil + --- 22K  ------------------ +-1V max           3v3 -
+                               |   +  -                             10K Pullup
+    +-20V - 60V RPM dependent  C  D1 D2         LM393 Comparitor  --------- Flywheel sense pin.
+                               |   -  +
+    Reactive Coil - --- 22K  ---------- GND ---
+
 
 
 ## NTC Mappings
@@ -209,7 +226,7 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 | 7 | `0x0080` | Water Flow | Raw water flow collapse: Exhaust elbow rate-of-rise > 8.0 °C in 30s or absolute temp > 45.0 °C. |
 | 8 | `0x0100` | Water in Fuel | Unused (`0`). |
 | 9 | `0x0200` | Charge Indicator | Alternator voltage < 12.2 V sustained for > 5 seconds while running. |
-| 10 | `0x0400` | Preheat Indicator | Glow plug relay active (GPIO7 GlowCoil input). |
+| 10 | `0x0400` | Preheat Indicator | Glow plug relay active (GPIO6 Glow input). |
 | 11 | `0x0800` | High Boost Pressure | Unused (`0`). |
 | 12 | `0x1000` | Rev Limit Exceeded | Unused (`0`). |
 | 13 | `0x2000` | EGR System | Unused (`0`). |

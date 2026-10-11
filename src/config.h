@@ -8,8 +8,8 @@
 #define PIN_CAN_TX          3
 #define PIN_FLYWHEEL        4
 #define PIN_STOP_COIL       5
-#define PIN_START_COIL      6
-#define PIN_GLOW_COIL       7
+#define PIN_GLOW_COIL       6
+#define PIN_START_COIL      7
 #define PIN_I2C_SDA         8
 #define PIN_I2C_SCL         9
 #define PIN_ONE_WIRE        10
@@ -47,6 +47,8 @@
 // Voltage Dividers (12V side: 10K / 4K7)
 // V_adc = V_in * 4.7 / (10 + 4.7) => V_in = V_adc * (14.7 / 4.7) = 3.12765957
 #define VOLTAGE_SCALE               (14.7 / 4.7)
+// Alternator V_adc = V_in * 3.3 / (10 + 3.3) => V_in = V_adc * (13.3 / 3.3) = 4.0303030303, max arround 18V
+#define VOLTAGE_SCALE_ALTERNATOR    (13.3 / 3.3)
 
 // NTC Thermistors (10K @ 25C, 4K7 pullup to 5V)
 #define NTC_R_TOP_OHM               4700.0f

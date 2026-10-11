@@ -126,7 +126,7 @@ void SensorProcessing::update(EngineState &state,
     state.engineBlockOffsetV = 2.0f * adc.engineBlock_V - 5.0f;
 
     // 3. Electrical Voltages
-    state.alternatorVoltage = adc.alternatorVoltage_V * VOLTAGE_SCALE;
+    state.alternatorVoltage = adc.alternatorVoltage_V * VOLTAGE_SCALE_ALTERNATOR;
     state.engineBatteryVoltage = adc.engineBattery_V * VOLTAGE_SCALE;
     state.spareVoltage = adc.spareVoltage_V * VOLTAGE_SCALE;
 
