@@ -1760,11 +1760,12 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Diode:1N47xxA"
+		(symbol "Diode:BAT46"
 			(pin_numbers
 				(hide yes)
 			)
 			(pin_names
+				(offset 1.016)
 				(hide yes)
 			)
 			(exclude_from_sim no)
@@ -1778,7 +1779,7 @@
 					)
 				)
 			)
-			(property "Value" "1N47xxA"
+			(property "Value" "BAT46"
 				(at 0 -2.54 0)
 				(effects
 					(font
@@ -1786,7 +1787,7 @@
 					)
 				)
 			)
-			(property "Footprint" "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal"
+			(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
 				(at 0 -4.445 0)
 				(effects
 					(font
@@ -1795,7 +1796,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+			(property "Datasheet" "http://www.vishay.com/docs/85662/bat46.pdf"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1804,7 +1805,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+			(property "Description" "100V 0.15A Small Signal Schottky Diode, DO-35"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1813,7 +1814,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "zener diode"
+			(property "ki_keywords" "diode Schottky"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1822,7 +1823,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "D*DO?41*"
+			(property "ki_fp_filters" "D*DO?35*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1831,10 +1832,22 @@
 					(hide yes)
 				)
 			)
-			(symbol "1N47xxA_0_1"
+			(symbol "BAT46_0_1"
 				(polyline
 					(pts
-						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -0.762 1.27)
+						(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
 					)
 					(stroke
 						(width 0.254)
@@ -1856,20 +1869,8 @@
 						(type none)
 					)
 				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
 			)
-			(symbol "1N47xxA_1_1"
+			(symbol "BAT46_1_1"
 				(pin passive line
 					(at -3.81 0 0)
 					(length 2.54)
@@ -4084,12 +4085,6 @@
 		(uuid "23e50b05-bda5-4899-8dcd-5491c616f2b5")
 	)
 	(junction
-		(at 250.19 116.84)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "24a872f7-41a8-4c87-b62f-d3d21aa97d6d")
-	)
-	(junction
 		(at 62.23 39.37)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4130,6 +4125,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "589a2b8d-db2a-418d-9cea-22df5fc2dee7")
+	)
+	(junction
+		(at 250.19 116.84)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "60d75954-248d-4b85-8fe7-31cbc5185bec")
 	)
 	(junction
 		(at 214.63 35.56)
@@ -4308,6 +4309,10 @@
 	(no_connect
 		(at 76.2 106.68)
 		(uuid "449de9fa-7a5a-43f9-b470-df775fe01fd9")
+	)
+	(no_connect
+		(at 76.2 116.84)
+		(uuid "5f249266-e728-4e01-a543-03216fdd4c22")
 	)
 	(no_connect
 		(at 95.25 189.23)
@@ -4597,7 +4602,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "391ec17c-01ac-43ed-a831-adc9c538e0a6")
+		(uuid "37e310f8-3fc0-4fed-b15d-83c5fd86570f")
 	)
 	(wire
 		(pts
@@ -4808,6 +4813,16 @@
 			(type default)
 		)
 		(uuid "71051923-620c-4abe-bdf9-5ea6921ee58a")
+	)
+	(wire
+		(pts
+			(xy 247.65 116.84) (xy 250.19 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7429bc1d-9202-47e4-b1fc-dc9d4d1c891f")
 	)
 	(wire
 		(pts
@@ -5178,16 +5193,6 @@
 			(type default)
 		)
 		(uuid "b96fc737-4e2f-4401-9294-f898e1ac8956")
-	)
-	(wire
-		(pts
-			(xy 247.65 116.84) (xy 250.19 116.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b997af19-b157-48a5-814b-97059b57a8dc")
 	)
 	(wire
 		(pts
@@ -5677,6 +5682,26 @@
 		(uuid "1a8aeb1f-b3df-4537-bce0-94fa9a1d689c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 72.39 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "3v3"
+		(shape input)
+		(at 82.55 142.24 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "25ad78b4-3655-48c4-ac31-1bcae800b330")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 82.55 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7149,6 +7174,26 @@
 			)
 		)
 	)
+	(global_label "3v3"
+		(shape input)
+		(at 99.06 142.24 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "c060d427-3486-4a9d-a47c-e28760377e67")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 99.06 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "CAN-H"
 		(shape bidirectional)
 		(at 95.25 181.61 0)
@@ -7443,6 +7488,28 @@
 			)
 		)
 	)
+	(global_label "5V"
+		(shape input)
+		(at 250.19 109.22 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "e8530f57-f98e-4528-8da4-98ad67492e02")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 244.9067 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "NTC4"
 		(shape output)
 		(at 204.47 96.52 180)
@@ -7477,6 +7544,26 @@
 		(uuid "ebf4b0cc-6631-4821-9e52-01cec0952a11")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 132.08 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "3v3"
+		(shape input)
+		(at 68.58 142.24 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "f11b27f5-85f4-49bf-899c-24f4b6d16b3e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 68.58 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7765,73 +7852,6 @@
 		)
 	)
 	(symbol
-		(lib_name "GND_1")
-		(lib_id "power:GND")
-		(at 68.58 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0570e154-356d-4bcc-bdab-37d1b25ce079")
-		(property "Reference" "#PWR038"
-			(at 68.58 163.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 68.58 162.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 68.58 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 68.58 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 68.58 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e61445b3-619e-4e6e-bef2-d840584fffae")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "#PWR038")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 38.1 148.59 0)
 		(mirror y)
@@ -8017,7 +8037,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SMA"
+		(property "Footprint" "Diode_SMD:D_SMA-SMB_Universal_Handsoldering"
 			(at 53.34 33.02 0)
 			(effects
 				(font
@@ -8154,7 +8174,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-123"
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 214.63 39.37 0)
 			(effects
 				(font
@@ -8407,7 +8427,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-123"
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 210.82 39.37 0)
 			(effects
 				(font
@@ -8470,76 +8490,6 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "D7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:1N47xxA")
-		(at 250.19 120.65 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1247cc9c-d6f7-4ba4-8ecc-103ac8083408")
-		(property "Reference" "D10"
-			(at 252.73 119.3799 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1N47xxA 5v1"
-			(at 252.73 121.9199 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
-			(at 245.745 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
-			(at 250.19 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
-			(at 250.19 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "68bddc84-ebe8-43b2-b484-135f38af8ab5")
-		)
-		(pin "2"
-			(uuid "7164dfc9-c70c-4a5a-9c3b-8948b7161f62")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "D10")
 					(unit 1)
 				)
 			)
@@ -8795,7 +8745,7 @@
 				)
 			)
 		)
-		(property "Value" "220K"
+		(property "Value" "470K"
 			(at 194.31 22.86 90)
 			(effects
 				(font
@@ -8880,7 +8830,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 35.56 148.59 0)
 			(effects
 				(font
@@ -9112,7 +9062,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "4K7"
 			(at 73.66 58.42 0)
 			(effects
 				(font
@@ -9198,7 +9148,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 55.88 33.02 0)
 			(effects
 				(font
@@ -9341,76 +9291,6 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "D9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:1N47xxA")
-		(at 82.55 153.67 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2ae3c9d7-37e1-4d2c-8592-0c514397b8c7")
-		(property "Reference" "D4"
-			(at 85.09 152.3999 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1N47xxA 3v3"
-			(at 85.09 154.9399 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
-			(at 78.105 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
-			(at 82.55 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
-			(at 82.55 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f5941f61-8548-4e1e-820b-4dbd2a715b77")
-		)
-		(pin "2"
-			(uuid "e2c01b4c-d2c4-4c36-b723-2318c8106b79")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -10297,7 +10177,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "470nF"
+		(property "Value" "1nF"
 			(at 220.98 40.64 0)
 			(effects
 				(font
@@ -11298,6 +11178,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Diode:BAT46")
+		(at 250.19 113.03 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6578af91-7794-4047-a7b3-33a563b284cc")
+		(property "Reference" "D6"
+			(at 252.73 111.4424 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BAT46"
+			(at 252.73 113.9824 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+			(at 245.745 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.vishay.com/docs/85662/bat46.pdf"
+			(at 250.19 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "100V 0.15A Small Signal Schottky Diode, DO-35"
+			(at 250.19 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "ef8057a5-b467-4aa3-b53d-c03ef72f8f86")
+		)
+		(pin "1"
+			(uuid "c911f8bb-871a-4d0a-aedf-0fa6a5f74b33")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 173.99 105.41 0)
 		(unit 1)
@@ -11520,6 +11470,76 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "J13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:BAT46")
+		(at 82.55 146.05 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6b30e912-053a-444d-aa83-bfa4ead505e8")
+		(property "Reference" "D10"
+			(at 85.09 144.4624 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BAT46"
+			(at 85.09 147.0024 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+			(at 78.105 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.vishay.com/docs/85662/bat46.pdf"
+			(at 82.55 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "100V 0.15A Small Signal Schottky Diode, DO-35"
+			(at 82.55 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "0b5e3d1c-4552-4224-b079-bae0a10e68d1")
+		)
+		(pin "1"
+			(uuid "5b5dae7f-c189-43c8-a88f-3de32d2dba12")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D10")
 					(unit 1)
 				)
 			)
@@ -12424,73 +12444,6 @@
 		)
 	)
 	(symbol
-		(lib_name "GND_1")
-		(lib_id "power:GND")
-		(at 99.06 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7f81cb47-6d57-4235-bdbb-38dcf95154b6")
-		(property "Reference" "#PWR034"
-			(at 99.06 163.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 99.06 162.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 99.06 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 99.06 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 99.06 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a2b934ab-ad82-4fb7-b576-181a44f6b1b5")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "#PWR034")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 243.84 116.84 270)
 		(unit 1)
@@ -12517,7 +12470,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
 			(at 243.84 115.062 90)
 			(effects
 				(font
@@ -13219,73 +13172,6 @@
 		)
 	)
 	(symbol
-		(lib_name "GND_1")
-		(lib_id "power:GND")
-		(at 82.55 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "90f5ce12-84aa-404d-8566-96c5ea31a7ad")
-		(property "Reference" "#PWR037"
-			(at 82.55 163.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 82.55 162.56 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 82.55 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 82.55 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 82.55 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "90001a6d-fd29-46e2-892f-07440876783e")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "#PWR037")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 146.05 85.09 270)
 		(unit 1)
@@ -13757,7 +13643,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "4K7"
 			(at 95.25 81.28 0)
 			(effects
 				(font
@@ -14047,17 +13933,17 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N47xxA")
-		(at 99.06 153.67 270)
+		(lib_id "Diode:BAT46")
+		(at 99.06 146.05 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "a4135623-9cbe-4d0a-91ec-35ff95939e29")
+		(uuid "a4d4081e-3b51-4ce8-9efb-2d62ea1d58f4")
 		(property "Reference" "D11"
-			(at 101.6 152.3999 90)
+			(at 101.6 144.4624 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14065,8 +13951,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1N47xxA 3v3"
-			(at 101.6 154.9399 90)
+		(property "Value" "BAT46"
+			(at 101.6 147.0024 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14074,8 +13960,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
-			(at 94.615 153.67 0)
+		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+			(at 94.615 146.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14083,8 +13969,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
-			(at 99.06 153.67 0)
+		(property "Datasheet" "http://www.vishay.com/docs/85662/bat46.pdf"
+			(at 99.06 146.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14092,20 +13978,20 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
-			(at 99.06 153.67 0)
+		(property "Description" "100V 0.15A Small Signal Schottky Diode, DO-35"
+			(at 99.06 146.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(pin "1"
-			(uuid "a0daea68-9667-4867-903b-2d8bebf2c964")
 		)
 		(pin "2"
-			(uuid "3f581e62-fcf8-4dd1-af9f-c5a228720399")
+			(uuid "40c6e42e-52f1-432c-acea-59c8abbcdd6c")
+		)
+		(pin "1"
+			(uuid "1291e3ba-b181-41b6-8eb2-736740f9bc1e")
 		)
 		(instances
 			(project "esp32board"
@@ -14774,76 +14660,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N47xxA")
-		(at 68.58 153.67 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b783aea7-05fd-46b1-b9b3-8450af0b1a13")
-		(property "Reference" "D5"
-			(at 71.12 152.3999 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1N47xxA 3v3"
-			(at 71.12 154.9399 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
-			(at 64.135 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
-			(at 68.58 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
-			(at 68.58 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "655dac6d-7023-4fc6-87b4-a7c3aecda2c1")
-		)
-		(pin "2"
-			(uuid "f72b81be-185f-4252-9eaf-78f1942645f0")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "D5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 247.65 41.91 0)
 		(mirror x)
@@ -15226,7 +15042,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "4K7"
 			(at 74.93 80.01 0)
 			(effects
 				(font
@@ -16058,7 +15874,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "4K7"
 			(at 93.98 59.69 0)
 			(effects
 				(font
@@ -17112,6 +16928,76 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:BAT46")
+		(at 68.58 146.05 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "fb2e3639-aa7a-4886-930f-f57029d099af")
+		(property "Reference" "D5"
+			(at 71.12 144.4624 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BAT46"
+			(at 71.12 147.0024 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+			(at 64.135 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.vishay.com/docs/85662/bat46.pdf"
+			(at 68.58 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "100V 0.15A Small Signal Schottky Diode, DO-35"
+			(at 68.58 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "40cf5332-5c89-4727-9dac-5c90c309a2fc")
+		)
+		(pin "1"
+			(uuid "e43a2182-221c-4247-bd70-101ee135be1a")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D5")
 					(unit 1)
 				)
 			)
