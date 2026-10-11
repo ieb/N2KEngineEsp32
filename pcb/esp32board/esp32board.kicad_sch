@@ -1760,6 +1760,155 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Diode:1N47xxA"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "1N47xxA"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal"
+				(at 0 -4.445 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "zener diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "D*DO?41*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "1N47xxA_0_1"
+				(polyline
+					(pts
+						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -0.762 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "1N47xxA_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Diode:SMAJ16CA"
 			(pin_numbers
 				(hide yes)
@@ -3862,7 +4011,7 @@
 	)
 	(text "The coolant sensor is fed from Engine Batt via a 1K resistor.\nEngine Batt+ terminal must be connected to the 1K resistor\nThe onboard 1K pullup R35 should only be added if not external."
 		(exclude_from_sim no)
-		(at 220.218 125.476 0)
+		(at 214.376 132.588 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3935,6 +4084,12 @@
 		(uuid "23e50b05-bda5-4899-8dcd-5491c616f2b5")
 	)
 	(junction
+		(at 250.19 116.84)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "24a872f7-41a8-4c87-b62f-d3d21aa97d6d")
+	)
+	(junction
 		(at 62.23 39.37)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3951,6 +4106,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "45341eb6-b68b-4734-bd05-1fbbcf5c8d73")
+	)
+	(junction
+		(at 92.71 149.86)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "495ce727-a350-41c8-8ea1-a56654ab053e")
 	)
 	(junction
 		(at 223.52 146.05)
@@ -3987,6 +4148,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "80b29c0f-8811-43c4-a1f7-b1d13212cf78")
+	)
+	(junction
+		(at 63.5 149.86)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "861fa85f-069d-4b76-8d45-6232348df218")
 	)
 	(junction
 		(at 154.94 46.99)
@@ -4101,6 +4268,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "e7720519-cf03-4859-a91b-7ad4c2efd1e8")
+	)
+	(junction
+		(at 78.74 149.86)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ed178bc2-cc68-4a32-bf8f-a673710d7566")
 	)
 	(junction
 		(at 124.46 52.07)
@@ -4418,6 +4591,16 @@
 	)
 	(wire
 		(pts
+			(xy 250.19 116.84) (xy 254 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "391ec17c-01ac-43ed-a831-adc9c538e0a6")
+	)
+	(wire
+		(pts
 			(xy 96.52 66.04) (xy 99.06 66.04)
 		)
 		(stroke
@@ -4455,6 +4638,16 @@
 			(type default)
 		)
 		(uuid "425d095b-45f4-40e8-8b1e-d284c766c409")
+	)
+	(wire
+		(pts
+			(xy 63.5 149.86) (xy 68.58 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "481157b8-0705-42ba-8fb2-51a5b8e94be7")
 	)
 	(wire
 		(pts
@@ -4705,6 +4898,26 @@
 			(type default)
 		)
 		(uuid "8769afc3-15b8-4592-94fd-3f2f964e4b38")
+	)
+	(wire
+		(pts
+			(xy 78.74 149.86) (xy 82.55 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8863d8ad-af6d-49f8-bdcd-3b6de5a9f967")
+	)
+	(wire
+		(pts
+			(xy 92.71 149.86) (xy 99.06 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c8228c2-4525-4208-82b2-f291ba1cd276")
 	)
 	(wire
 		(pts
@@ -4965,6 +5178,16 @@
 			(type default)
 		)
 		(uuid "b96fc737-4e2f-4401-9294-f898e1ac8956")
+	)
+	(wire
+		(pts
+			(xy 247.65 116.84) (xy 250.19 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b997af19-b157-48a5-814b-97059b57a8dc")
 	)
 	(wire
 		(pts
@@ -5290,6 +5513,26 @@
 		(uuid "03c45508-8211-4efe-8dcb-8cace5f24390")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 34.29 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "3v3"
+		(shape input)
+		(at 31.75 152.4 180)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify right)
+		)
+		(uuid "0a9c1dbf-b954-4c09-98a1-42d6dad6bd24")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 31.75 152.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5992,7 +6235,7 @@
 	)
 	(global_label "Coolant"
 		(shape output)
-		(at 247.65 116.84 0)
+		(at 254 116.84 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6002,7 +6245,7 @@
 		)
 		(uuid "4ea6c302-952b-46a7-bf16-4ae11ec3a295")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 257.8921 116.84 0)
+			(at 264.2421 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6906,28 +7149,6 @@
 			)
 		)
 	)
-	(global_label "5V"
-		(shape input)
-		(at 31.75 152.4 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "bf17f956-8473-410e-80bf-9f2c8e6f0d18")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 26.4667 152.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
 	(global_label "CAN-H"
 		(shape bidirectional)
 		(at 95.25 181.61 0)
@@ -7538,6 +7759,73 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "#PWR018")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "GND_1")
+		(lib_id "power:GND")
+		(at 68.58 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0570e154-356d-4bcc-bdab-37d1b25ce079")
+		(property "Reference" "#PWR038"
+			(at 68.58 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 68.58 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 68.58 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 68.58 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 68.58 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e61445b3-619e-4e6e-bef2-d840584fffae")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "#PWR038")
 					(unit 1)
 				)
 			)
@@ -8188,6 +8476,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Diode:1N47xxA")
+		(at 250.19 120.65 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1247cc9c-d6f7-4ba4-8ecc-103ac8083408")
+		(property "Reference" "D10"
+			(at 252.73 119.3799 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1N47xxA 5v1"
+			(at 252.73 121.9199 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
+			(at 245.745 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+			(at 250.19 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+			(at 250.19 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "68bddc84-ebe8-43b2-b484-135f38af8ab5")
+		)
+		(pin "2"
+			(uuid "7164dfc9-c70c-4a5a-9c3b-8948b7161f62")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 223.52 142.24 0)
 		(mirror x)
@@ -8261,6 +8619,73 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "R41")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "GND_1")
+		(lib_id "power:GND")
+		(at 250.19 124.46 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "16cdfa79-d7cb-4d43-8327-abc845aa7ea6")
+		(property "Reference" "#PWR039"
+			(at 250.19 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 250.19 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 250.19 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 250.19 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 250.19 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4ab02195-d338-48cd-9d06-9fd719c7375a")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -8916,6 +9341,76 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "D9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:1N47xxA")
+		(at 82.55 153.67 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2ae3c9d7-37e1-4d2c-8592-0c514397b8c7")
+		(property "Reference" "D4"
+			(at 85.09 152.3999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1N47xxA 3v3"
+			(at 85.09 154.9399 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
+			(at 78.105 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+			(at 82.55 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+			(at 82.55 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f5941f61-8548-4e1e-820b-4dbd2a715b77")
+		)
+		(pin "2"
+			(uuid "e2c01b4c-d2c4-4c36-b723-2318c8106b79")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -11781,7 +12276,7 @@
 		(fields_autoplaced yes)
 		(uuid "79bfd6f1-be5c-4155-8d05-255c6d481ded")
 		(property "Reference" "R10"
-			(at 80.645 152.4 0)
+			(at 81.28 152.3999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11789,13 +12284,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "2.2K"
-			(at 80.645 154.94 0)
+		(property "Value" "3K3"
+			(at 81.28 154.9399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
@@ -11922,6 +12418,73 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "R40")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "GND_1")
+		(lib_id "power:GND")
+		(at 99.06 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7f81cb47-6d57-4235-bdbb-38dcf95154b6")
+		(property "Reference" "#PWR034"
+			(at 99.06 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 99.06 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 99.06 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 99.06 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 99.06 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a2b934ab-ad82-4fb7-b576-181a44f6b1b5")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -12650,6 +13213,73 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "#PWR016")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "GND_1")
+		(lib_id "power:GND")
+		(at 82.55 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "90f5ce12-84aa-404d-8566-96c5ea31a7ad")
+		(property "Reference" "#PWR037"
+			(at 82.55 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 82.55 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 82.55 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 82.55 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 82.55 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "90001a6d-fd29-46e2-892f-07440876783e")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "#PWR037")
 					(unit 1)
 				)
 			)
@@ -13417,6 +14047,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Diode:1N47xxA")
+		(at 99.06 153.67 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a4135623-9cbe-4d0a-91ec-35ff95939e29")
+		(property "Reference" "D11"
+			(at 101.6 152.3999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1N47xxA 3v3"
+			(at 101.6 154.9399 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
+			(at 94.615 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+			(at 99.06 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+			(at 99.06 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a0daea68-9667-4867-903b-2d8bebf2c964")
+		)
+		(pin "2"
+			(uuid "3f581e62-fcf8-4dd1-af9f-c5a228720399")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
 		(at 209.55 104.14 0)
 		(unit 1)
@@ -14005,7 +14705,7 @@
 		(fields_autoplaced yes)
 		(uuid "b486c7ea-04d3-40f7-8e0f-abb569a0e840")
 		(property "Reference" "R6"
-			(at 65.405 152.4 0)
+			(at 66.04 152.3999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14013,13 +14713,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "2.2K"
-			(at 65.405 154.94 0)
+		(property "Value" "3K3"
+			(at 66.04 154.9399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
@@ -14067,6 +14768,76 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "R6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:1N47xxA")
+		(at 68.58 153.67 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b783aea7-05fd-46b1-b9b3-8450af0b1a13")
+		(property "Reference" "D5"
+			(at 71.12 152.3999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1N47xxA 3v3"
+			(at 71.12 154.9399 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_T-1_P5.08mm_Horizontal"
+			(at 64.135 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.vishay.com/docs/85816/1n4728a.pdf"
+			(at 68.58 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "1300mW Silicon planar power Zener diodes, DO-41"
+			(at 68.58 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "655dac6d-7023-4fc6-87b4-a7c3aecda2c1")
+		)
+		(pin "2"
+			(uuid "f72b81be-185f-4252-9eaf-78f1942645f0")
+		)
+		(instances
+			(project "esp32board"
+				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
+					(reference "D5")
 					(unit 1)
 				)
 			)
@@ -16209,7 +16980,7 @@
 		(fields_autoplaced yes)
 		(uuid "fa56bd24-b30b-4056-812e-23c66c8d2012")
 		(property "Reference" "R12"
-			(at 94.615 152.4 0)
+			(at 95.25 152.3999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16217,8 +16988,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "2.2K"
-			(at 94.615 154.94 0)
+		(property "Value" "3K3"
+			(at 95.25 154.9399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
