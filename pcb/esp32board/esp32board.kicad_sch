@@ -6236,24 +6236,24 @@
 			)
 		)
 	)
-	(global_label "Engine Batt+"
+	(global_label "Engine Batt Switched +"
 		(shape input)
-		(at 256.54 137.16 0)
+		(at 240.03 116.84 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
-		(uuid "4b1cab20-cc93-4d50-8093-e2f783a41bdf")
+		(uuid "4d117766-644d-4651-a963-42c89d978e75")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 272.225 137.16 0)
+			(at 214.0641 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -6700,6 +6700,28 @@
 			)
 		)
 	)
+	(global_label "Engine Batt Switched +"
+		(shape input)
+		(at 256.54 137.16 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "92331686-d16f-4ae4-8594-71685f8ceb5f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 282.5059 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "5V"
 		(shape input)
 		(at 35.56 40.64 0)
@@ -6874,7 +6896,7 @@
 			)
 		)
 	)
-	(global_label "Engine Batt+"
+	(global_label "Engine Batt Switched +"
 		(shape output)
 		(at 234.95 105.41 180)
 		(fields_autoplaced yes)
@@ -6886,7 +6908,7 @@
 		)
 		(uuid "a69f88e8-6a3c-4ffc-830a-e50c4b00f92a")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 219.265 105.41 0)
+			(at 208.9841 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7356,28 +7378,6 @@
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Engine Batt+"
-		(shape input)
-		(at 240.03 116.84 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "d73808b2-0efb-4342-bb28-a66f9ba419cd")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 224.345 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
 				(hide yes)
 			)
 		)
@@ -8165,7 +8165,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SJ1"
+		(property "Value" "S1J"
 			(at 217.17 38.735 90)
 			(effects
 				(font
@@ -8418,7 +8418,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SJ1"
+		(property "Value" "S1J"
 			(at 208.28 40.005 90)
 			(effects
 				(font
@@ -8569,73 +8569,6 @@
 			(project "esp32board"
 				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
 					(reference "R41")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "GND_1")
-		(lib_id "power:GND")
-		(at 250.19 124.46 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "16cdfa79-d7cb-4d43-8327-abc845aa7ea6")
-		(property "Reference" "#PWR039"
-			(at 250.19 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 250.19 129.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 250.19 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 250.19 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 250.19 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "4ab02195-d338-48cd-9d06-9fd719c7375a")
-		)
-		(instances
-			(project "esp32board"
-				(path "/461a08a1-c6de-4673-bbd4-d74d528c254e"
-					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -11205,7 +11138,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+		(property "Footprint" "Diode_SMD:D_SOD-123"
 			(at 245.745 113.03 0)
 			(effects
 				(font
@@ -11503,7 +11436,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+		(property "Footprint" "Diode_SMD:D_SOD-123"
 			(at 78.105 146.05 0)
 			(effects
 				(font
@@ -12304,7 +12237,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "3K3"
+		(property "Value" "4K7"
 			(at 81.28 154.9399 0)
 			(effects
 				(font
@@ -13960,7 +13893,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+		(property "Footprint" "Diode_SMD:D_SOD-123"
 			(at 94.615 146.05 0)
 			(effects
 				(font
@@ -14599,7 +14532,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "3K3"
+		(property "Value" "4K7"
 			(at 66.04 154.9399 0)
 			(effects
 				(font
@@ -16804,7 +16737,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "3K3"
+		(property "Value" "4K7"
 			(at 95.25 154.9399 0)
 			(effects
 				(font
@@ -16961,7 +16894,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:Nexperia_CFP3_SOD-123W"
+		(property "Footprint" "Diode_SMD:D_SOD-123"
 			(at 64.135 146.05 0)
 			(effects
 				(font
