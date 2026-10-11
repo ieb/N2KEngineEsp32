@@ -62,6 +62,14 @@ double SensorProcessing::convertNtc(float voltage, int16_t &outDeciC) {
 
 
 double SensorProcessing::convertCoolant(float coolantV, float blockV, float batV, int16_t &outDeciC) {
+    outDeciC = -9999;
+
+    // Sense node at the BAT46 clamp: sender open-circuit or engine colder than the
+    // ADC can measure. The true value is unknown, so report N/A rather than a guess.
+    if (coolantV >= COOLANT_CLAMP_V) {
+        return N2kDoubleNA;
+    }
+
     // True voltages referenced to engine block
     float vCoolantBlock = coolantV - blockV;
     float vSupplyBlock  = batV - blockV;
@@ -69,14 +77,19 @@ double SensorProcessing::convertCoolant(float coolantV, float blockV, float batV
     if (vCoolantBlock < 0.0f) vCoolantBlock = 0.0f;
     if (vSupplyBlock < 5.0f) {
         // Battery supply too low to read coolant sensor
-        outDeciC = -9999;
         return N2kDoubleNA;
     }
 
     // Convert to 12V normalized ADC count (4096 counts @ 5V basis)
     // coolantReading_12V = (4096 * (vCoolant / 5.0)) * (12.0 / vSupply)
     float normalizedReading = 4096.0f * (vCoolantBlock / 5.0f) * (12.0f / vSupplyBlock);
+    if (normalizedReading > 32000.0f) normalizedReading = 32000.0f;
     int16_t reading = (int16_t)(normalizedReading + 0.5f);
+
+    // Shorted sender (or sense wire shorted to block) would otherwise read as 120C
+    if (reading < COOLANT_SHORT_COUNTS) {
+        return N2kDoubleNA;
+    }
 
     outDeciC = interpolateCurve(reading, COOLANT_MIN, COOLANT_MAX, COOLANT_STEP, coolantTable, COOLANT_LEN);
     return (0.1 * outDeciC) + 273.15;
@@ -123,34 +136,49 @@ void SensorProcessing::update(EngineState &state,
     // 2. Engine Block Negative Offset
     // Circuit: 5V --- 10K --- ADC (ADC2 AIN2) --- 10K --- Engine Block (-)
     // V_adc = (5.0 + V_block) / 2 => V_block = 2 * V_adc - 5.0
-    state.engineBlockOffsetV = 2.0f * adc.engineBlock_V - 5.0f;
+    // A disconnected block wire reads ~+5V; an implausible offset is not used for compensation.
+    float blockComp = 0.0f;
+    if (adc.adc2Ok) {
+        float block = 2.0f * adc.engineBlock_V - 5.0f;
+        state.engineBlockOffsetV = block;
+        if (block >= ENGINE_BLOCK_OFFSET_MIN_V && block <= ENGINE_BLOCK_OFFSET_MAX_V) {
+            blockComp = block;
+        }
+    } else {
+        state.engineBlockOffsetV = 0.0;
+    }
 
-    // 3. Electrical Voltages
-    state.alternatorVoltage = adc.alternatorVoltage_V * VOLTAGE_SCALE_ALTERNATOR;
-    state.engineBatteryVoltage = adc.engineBattery_V * VOLTAGE_SCALE;
-    state.spareVoltage = adc.spareVoltage_V * VOLTAGE_SCALE;
+    // 3. Electrical Voltages (N/A when the ADC chip is missing or failing)
+    state.alternatorVoltage = adc.adc1Ok ? adc.alternatorVoltage_V * VOLTAGE_SCALE_ALTERNATOR : N2kDoubleNA;
+    state.engineBatteryVoltage = adc.adc2Ok ? adc.engineBattery_V * VOLTAGE_SCALE : N2kDoubleNA;
+    state.spareVoltage = adc.adc3Ok ? adc.spareVoltage_V * VOLTAGE_SCALE : N2kDoubleNA;
 
     // 4. Temperatures
     // NTC1: Exhaust Water Trap (Reported as Exhaust Gas)
-    state.exhaustWaterTrapK = convertNtc(adc.ntc1ExhaustWaterTrap_V, state.exhaustWaterTrap_dC);
+    state.exhaustWaterTrapK = convertNtc(adc.adc1Ok ? adc.ntc1ExhaustWaterTrap_V : 0.0f, state.exhaustWaterTrap_dC);
 
     // NTC2: Alternator
-    state.alternatorTempK = convertNtc(adc.ntc2Alternator_V, state.alternatorTemp_dC);
+    state.alternatorTempK = convertNtc(adc.adc1Ok ? adc.ntc2Alternator_V : 0.0f, state.alternatorTemp_dC);
 
     // NTC3: Engine Room
-    state.engineRoomTempK = convertNtc(adc.ntc3EngineRoom_V, state.engineRoomTemp_dC);
+    state.engineRoomTempK = convertNtc(adc.adc1Ok ? adc.ntc3EngineRoom_V : 0.0f, state.engineRoomTemp_dC);
 
     // NTC4: Gearbox
-    state.gearboxTempK = convertNtc(adc.ntc4Gearbox_V, state.gearboxTemp_dC);
+    state.gearboxTempK = convertNtc(adc.adc3Ok ? adc.ntc4Gearbox_V : 0.0f, state.gearboxTemp_dC);
 
     // NTC5: Exhaust Elbow
-    state.exhaustElbowTempK = convertNtc(adc.ntc5ExhaustElbow_V, state.exhaustElbowTemp_dC);
+    state.exhaustElbowTempK = convertNtc(adc.adc3Ok ? adc.ntc5ExhaustElbow_V : 0.0f, state.exhaustElbowTemp_dC);
 
     // Coolant (adjusted for block drop and battery voltage)
-    state.coolantTempK = convertCoolant(adc.coolant_V,
-                                        state.engineBlockOffsetV,
-                                        state.engineBatteryVoltage,
-                                        state.coolantTemp_dC);
+    if (adc.adc2Ok) {
+        state.coolantTempK = convertCoolant(adc.coolant_V,
+                                            blockComp,
+                                            (float)state.engineBatteryVoltage,
+                                            state.coolantTemp_dC);
+    } else {
+        state.coolantTempK = N2kDoubleNA;
+        state.coolantTemp_dC = -9999;
+    }
 
     // 1-Wire Dallas Temperatures
     state.oneWireCount = oneWire.getActiveCount();
@@ -159,6 +187,6 @@ void SensorProcessing::update(EngineState &state,
     }
 
     // 5. Pressures & Fluids
-    state.oilPressurePa = convertOilPressure(adc.oilPressure_V);
-    state.fuelLevelPercent = convertFuelLevel(adc.fuel_V);
+    state.oilPressurePa = adc.adc2Ok ? convertOilPressure(adc.oilPressure_V) : N2kDoubleNA;
+    state.fuelLevelPercent = adc.adc3Ok ? convertFuelLevel(adc.fuel_V) : N2kDoubleNA;
 }

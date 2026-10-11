@@ -35,26 +35,25 @@ void RpmSensor::update() {
         return;
     }
 
+    // Always sample the ISR counters so switching fake mode off does not produce
+    // a burst of accumulated pulses.
+    noInterrupts();
+    uint32_t pulses = isrPulseCount;
+    unsigned long lastPulseUs = isrLastPulseMicros;
+    interrupts();
+
+    uint32_t deltaPulses = pulses - lastPulseCount;
+    lastPulseCount = pulses;
+    lastCalcTime = now;
+
     if (fakeActive) {
         currentRpm = fakeRpm;
-    } else {
-        // Atomic read of ISR counters
-        noInterrupts();
-        uint32_t pulses = isrPulseCount;
-        unsigned long lastPulseUs = isrLastPulseMicros;
-        interrupts();
-
-        uint32_t deltaPulses = pulses - lastPulseCount;
-        lastPulseCount = pulses;
-        lastCalcTime = now;
-
+    } else if ((micros() - lastPulseUs) > 500000UL) {
         // If no pulse received for > 500ms, RPM is 0
-        if ((micros() - lastPulseUs) > 500000UL) {
-            currentRpm = 0.0;
-        } else if (dt > 0) {
-            double freqHz = (double)deltaPulses * 1000.0 / (double)dt;
-            currentRpm = freqHz * RPM_FACTOR;
-        }
+        currentRpm = 0.0;
+    } else {
+        double freqHz = (double)deltaPulses * 1000.0 / (double)dt;
+        currentRpm = freqHz * RPM_FACTOR;
     }
 
     // Evaluate running vs stopping states
@@ -69,7 +68,12 @@ void RpmSensor::update() {
         if (engineRunning) {
             engineRunning = false;
             engineStopping = true;
-            Serial.printf("[RPM] Engine STOPPING / STOPPED (%.1f RPM)\n", currentRpm);
+            Serial.printf("[RPM] Engine STOPPING (%.1f RPM)\n", currentRpm);
+        }
+        // Stopping lasts until the flywheel has come to rest
+        if (engineStopping && currentRpm <= 0.0) {
+            engineStopping = false;
+            Serial.println(F("[RPM] Engine STOPPED"));
         }
     }
 }

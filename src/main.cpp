@@ -26,6 +26,18 @@ EngineState      engineState;
 bool adcDebugOutput = false;
 unsigned long lastHoursTick = 0;
 unsigned long lastStatusPrint = 0;
+bool wasEngineRunning = false;
+
+// Non-blocking line entry for the 'E' (set engine hours) command
+bool hoursEntryActive = false;
+unsigned long hoursEntryStart = 0;
+char hoursEntryBuf[16];
+size_t hoursEntryLen = 0;
+#define HOURS_ENTRY_TIMEOUT_MS 30000UL
+
+static double naOr(double v, double fallback) {
+    return v != N2kDoubleNA ? v : fallback;
+}
 
 void printStatus() {
     Serial.println(F("==================== ENGINE STATUS ===================="));
@@ -68,8 +80,8 @@ void printStatus() {
                   engineState.fuelCapacityLitres);
 
     Serial.println(F("--- Electrical ---"));
-    Serial.printf("Engine Battery:      %.2f V\n", engineState.engineBatteryVoltage);
-    Serial.printf("Alternator Output:   %.2f V\n", engineState.alternatorVoltage);
+    Serial.printf("Engine Battery:      %.2f V\n", naOr(engineState.engineBatteryVoltage, -999.0));
+    Serial.printf("Alternator Output:   %.2f V\n", naOr(engineState.alternatorVoltage, -999.0));
     Serial.printf("Engine Block Offset: %+.3f V (relative to 0V)\n", engineState.engineBlockOffsetV);
 
     Serial.println(F("--- Relays ---"));
@@ -108,7 +120,42 @@ void showHelp() {
     Serial.println(F("  'R' - Restart ESP32"));
 }
 
+void handleHoursEntry() {
+    while (Serial.available()) {
+        char c = Serial.read();
+        if (c == '\r') continue;
+        if (c == '\n') {
+            hoursEntryActive = false;
+            if (hoursEntryLen == 0) {
+                Serial.println(F("Canceled"));
+                return;
+            }
+            hoursEntryBuf[hoursEntryLen] = '\0';
+            double hrs = atof(hoursEntryBuf);
+            if (hrs < 0.0 || hrs > 1000000.0) {
+                Serial.println(F("Invalid value"));
+                return;
+            }
+            uint32_t secs = (uint32_t)(hrs * 3600.0);
+            storageManager.setEngineHoursSeconds(secs);
+            engineState.engineHoursSeconds = secs;
+            return;
+        }
+        if (hoursEntryLen < sizeof(hoursEntryBuf) - 1) {
+            hoursEntryBuf[hoursEntryLen++] = c;
+        }
+    }
+    if (millis() - hoursEntryStart > HOURS_ENTRY_TIMEOUT_MS) {
+        hoursEntryActive = false;
+        Serial.println(F("Canceled (timeout)"));
+    }
+}
+
 void handleCli() {
+    if (hoursEntryActive) {
+        handleHoursEntry();
+        return;
+    }
     if (!Serial.available()) return;
     char ch = Serial.read();
     switch (ch) {
@@ -121,23 +168,13 @@ void handleCli() {
         case 'F':
             rpmSensor.toggleFakeRpm(1000.0);
             break;
-        case 'E': {
-            Serial.setTimeout(10000);
+        case 'E':
+            // Non-blocking: the main loop keeps running while the value is typed
             Serial.print(F("Enter new Engine Hours ?> "));
-            char buf[16];
-            size_t len = Serial.readBytesUntil('\n', buf, sizeof(buf) - 1);
-            if (len > 0) {
-                buf[len] = '\0';
-                double hrs = atof(buf);
-                uint32_t secs = (uint32_t)(hrs * 3600.0);
-                storageManager.setEngineHoursSeconds(secs);
-                engineState.engineHoursSeconds = secs;
-            } else {
-                Serial.println(F("Canceled"));
-            }
-            Serial.setTimeout(100);
+            hoursEntryActive = true;
+            hoursEntryStart = millis();
+            hoursEntryLen = 0;
             break;
-        }
         case 'l':
             storageManager.dumpEvents(Serial);
             break;
@@ -150,6 +187,7 @@ void handleCli() {
             break;
         case 'R':
             Serial.println(F("Restarting..."));
+            storageManager.saveEngineHoursIfNeeded(true);
             delay(100);
             ESP.restart();
             break;
@@ -196,14 +234,24 @@ void loop() {
                            oneWireTemp);
 
     // 3. Engine hours accumulation (every second while engine is running)
+    // Advance the tick by exactly 1000ms so loop latency does not cause drift.
     unsigned long now = millis();
     if (now - lastHoursTick >= 1000) {
-        lastHoursTick = now;
+        if (now - lastHoursTick > 5000) {
+            lastHoursTick = now; // resync after a long stall rather than burst-counting
+        } else {
+            lastHoursTick += 1000;
+        }
         if (engineState.isEngineRunning) {
             storageManager.tickEngineHours(1);
             engineState.engineHoursSeconds = storageManager.getEngineHoursSeconds();
         }
     }
+    // Persist hours as soon as the engine stops (power is often cut right after)
+    if (wasEngineRunning && !engineState.isEngineRunning) {
+        storageManager.saveEngineHoursIfNeeded(true);
+    }
+    wasEngineRunning = engineState.isEngineRunning;
 
     // 4. Alarm evaluation & persistent event logging
     alarmManager.update(engineState, storageManager);

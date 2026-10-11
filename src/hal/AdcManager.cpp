@@ -8,6 +8,16 @@ AdcManager::AdcManager()
       currentChannel(0),
       conversionPending(false),
       conversionStartTime(0) {
+    for (int i = 0; i < 3; i++) {
+        present[i] = false;
+        errorCount[i] = 0;
+    }
+}
+
+bool &AdcManager::okFlag(uint8_t chip) {
+    if (chip == 1) return readings.adc1Ok;
+    if (chip == 2) return readings.adc2Ok;
+    return readings.adc3Ok;
 }
 
 bool AdcManager::begin(TwoWire &wire) {
@@ -41,10 +51,14 @@ bool AdcManager::begin(TwoWire &wire) {
         Serial.println(F("[ADC] ADS3 (0x4B) not found on I2C"));
     }
 
+    present[0] = readings.adc1Ok;
+    present[1] = readings.adc2Ok;
+    present[2] = readings.adc3Ok;
+
     // Trigger initial conversions on channel 0
-    if (readings.adc1Ok) ads1.requestADC(0);
-    if (readings.adc2Ok) ads2.requestADC(0);
-    if (readings.adc3Ok) ads3.requestADC(0);
+    if (present[0]) ads1.requestADC(0);
+    if (present[1]) ads2.requestADC(0);
+    if (present[2]) ads3.requestADC(0);
     currentChannel = 0;
     conversionPending = true;
     conversionStartTime = millis();
@@ -115,47 +129,55 @@ void AdcManager::storeReading(uint8_t chip, uint8_t channel, int16_t rawCounts, 
     }
 }
 
+void AdcManager::readChip(uint8_t chip, ADS1115 &ads, bool ready) {
+    uint8_t idx = chip - 1;
+    if (!present[idx]) return;
+
+    bool good = false;
+    if (ready) {
+        int16_t raw = ads.getValue();
+        if (ads.getError() == ADS1X15_OK) {
+            float v = raw * ADS_VOLTS_PER_BIT;
+            if (v < 0.0f) v = 0.0f;
+            storeReading(chip, currentChannel, raw, (float)v);
+            good = true;
+        }
+    }
+
+    if (good) {
+        errorCount[idx] = 0;
+        okFlag(chip) = true;
+    } else if (errorCount[idx] < 255) {
+        errorCount[idx]++;
+        if (errorCount[idx] >= ADC_MAX_CONSECUTIVE_ERRORS && okFlag(chip)) {
+            okFlag(chip) = false;
+            Serial.printf("[ADC] ADS%u read failures, readings marked N/A\n", chip);
+        }
+    }
+}
+
 void AdcManager::update() {
     if (!conversionPending) {
         // Start conversion on currentChannel
-        if (readings.adc1Ok) ads1.requestADC(currentChannel);
-        if (readings.adc2Ok) ads2.requestADC(currentChannel);
-        if (readings.adc3Ok) ads3.requestADC(currentChannel);
+        if (present[0]) ads1.requestADC(currentChannel);
+        if (present[1]) ads2.requestADC(currentChannel);
+        if (present[2]) ads3.requestADC(currentChannel);
         conversionPending = true;
         conversionStartTime = millis();
         return;
     }
 
     // Check if conversion is ready on all active chips (or timeout after 25ms, since 64SPS is ~15.6ms)
-    bool ready1 = (!readings.adc1Ok) || ads1.isReady();
-    bool ready2 = (!readings.adc2Ok) || ads2.isReady();
-    bool ready3 = (!readings.adc3Ok) || ads3.isReady();
+    bool ready1 = (!present[0]) || ads1.isReady();
+    bool ready2 = (!present[1]) || ads2.isReady();
+    bool ready3 = (!present[2]) || ads3.isReady();
     bool timeout = (millis() - conversionStartTime) > 25;
 
     if ((ready1 && ready2 && ready3) || timeout) {
-        // Read conversion results
-        const float lsbVolts = 6.144f / 32768.0f; // 0.1875 mV per bit
-
-        if (readings.adc1Ok) {
-            int16_t val1 = ads1.getValue();
-            float v1 = val1 * lsbVolts;
-            if (v1 < 0.0f) v1 = 0.0f;
-            storeReading(1, currentChannel, val1, v1);
-        }
-
-        if (readings.adc2Ok) {
-            int16_t val2 = ads2.getValue();
-            float v2 = val2 * lsbVolts;
-            if (v2 < 0.0f) v2 = 0.0f;
-            storeReading(2, currentChannel, val2, v2);
-        }
-
-        if (readings.adc3Ok) {
-            int16_t val3 = ads3.getValue();
-            float v3 = val3 * lsbVolts;
-            if (v3 < 0.0f) v3 = 0.0f;
-            storeReading(3, currentChannel, val3, v3);
-        }
+        // A chip not ready at timeout counts as a failed read (its value would be stale)
+        readChip(1, ads1, ready1);
+        readChip(2, ads2, ready2);
+        readChip(3, ads3, ready3);
 
         // Advance to next channel (0..3)
         currentChannel = (currentChannel + 1) & 0x03;

@@ -140,6 +140,36 @@ void run_sensor_processing_tests() {
 
     // Supply rail too low (< 5.0V)
     TEST_ASSERT(sp.testCoolant(1.4f, 0.0f, 4.0f, deciC) == N2kDoubleNA, "Coolant supply < 5V returns N2kDoubleNA");
+
+    // Shorted sender must not read as 120C
+    TEST_ASSERT(sp.testCoolant(0.0f, 0.0f, 12.0f, deciC) == N2kDoubleNA, "Coolant shorted sender returns N2kDoubleNA");
+    TEST_ASSERT(deciC == -9999, "Coolant shorted sender deciC is -9999");
+
+    // Sense node at the 5V clamp (open sender / too cold to measure)
+    TEST_ASSERT(sp.testCoolant(5.2f, 0.0f, 12.0f, deciC) == N2kDoubleNA, "Coolant at clamp returns N2kDoubleNA");
+
+    // --- Full update(): disconnected engine block wire and missing ADC chips ---
+    {
+        EngineState st;
+        AdcReadings adc;
+        adc.adc1Ok = adc.adc2Ok = adc.adc3Ok = true;
+        adc.coolant_V = 1.4184f;              // 60C
+        adc.engineBattery_V = 12.0f / (float)VOLTAGE_SCALE;
+        adc.engineBlock_V = 5.0f;              // block wire disconnected (offset +5V)
+        RpmSensor rpm;
+        RelayCoilStates relays;
+        OneWireTemp ow;
+        sp.update(st, adc, rpm, relays, ow);
+        TEST_ASSERT_NEAR(st.coolantTempK - 273.15, 60.0, 1.5, "Coolant ignores implausible block offset");
+
+        AdcReadings missing; // all chips absent
+        sp.update(st, missing, rpm, relays, ow);
+        TEST_ASSERT(st.engineBatteryVoltage == N2kDoubleNA, "Missing ADC2: battery voltage N/A");
+        TEST_ASSERT(st.alternatorVoltage == N2kDoubleNA, "Missing ADC1: alternator voltage N/A");
+        TEST_ASSERT(st.coolantTempK == N2kDoubleNA, "Missing ADC2: coolant N/A");
+        TEST_ASSERT(st.fuelLevelPercent == N2kDoubleNA, "Missing ADC3: fuel level N/A");
+        TEST_ASSERT(st.oilPressurePa == N2kDoubleNA, "Missing ADC2: oil pressure N/A");
+    }
 }
 
 // ============================================================================
@@ -274,6 +304,51 @@ void run_alarm_manager_tests() {
     state.stopRelayActive = true;
     am.update(state, sm);
     TEST_ASSERT((state.discreteStatus2 & STATUS2_ENGINE_SHUTTING_DOWN) != 0, "Engine Shutting Down active when stop coil on");
+
+    // --- Event latches reset between runs ---
+    {
+        AlarmManager am2;
+        StorageManager sm2;
+        sm2.begin();
+        sm2.clearEvents();
+        EngineState st;
+        st.oilPressurePa = 30000.0; // low
+        st.engineBatteryVoltage = 12.5;
+        st.alternatorVoltage = 14.0;
+
+        // Run 1: low oil trips and is logged, then engine stops with alarm active
+        set_simulated_millis(200000);
+        st.isEngineRunning = true; st.engineRpm = 1000.0;
+        am2.update(st, sm2);
+        set_simulated_millis(216000); am2.update(st, sm2);
+        set_simulated_millis(222000); am2.update(st, sm2);
+        uint32_t afterRun1 = sm2.getEventCount();
+        TEST_ASSERT(afterRun1 == 1, "Run 1 logs low oil once");
+
+        st.isEngineRunning = false; st.isEngineStopping = true; st.engineRpm = 300.0;
+        set_simulated_millis(223000); am2.update(st, sm2);
+        TEST_ASSERT((st.discreteStatus2 & STATUS2_ENGINE_SHUTTING_DOWN) != 0, "Shutting down during RPM run-down");
+        TEST_ASSERT(sm2.getEventCount() == afterRun1 + 1, "Engine stop logged once");
+        st.isEngineStopping = false; st.engineRpm = 0.0;
+        set_simulated_millis(224000); am2.update(st, sm2);
+        TEST_ASSERT((st.discreteStatus2 & STATUS2_ENGINE_SHUTTING_DOWN) == 0, "Shutting down clears at rest");
+        TEST_ASSERT(sm2.getEventCount() == afterRun1 + 1, "No duplicate stop event at rest");
+
+        // Run 2: same low oil condition must be logged again
+        set_simulated_millis(300000);
+        st.isEngineRunning = true; st.engineRpm = 1000.0;
+        am2.update(st, sm2);
+        set_simulated_millis(316000); am2.update(st, sm2);
+        set_simulated_millis(322000); am2.update(st, sm2);
+        TEST_ASSERT(sm2.getEventCount() == afterRun1 + 2, "Run 2 logs low oil again");
+
+        // Event dump reader returns the logged events oldest first
+        StorageManager::EventRecord recs[2];
+        uint8_t n = sm2.getRecentEvents(recs, 2);
+        TEST_ASSERT(n == 2, "getRecentEvents returns last 2 events");
+        TEST_ASSERT(n == 2 && recs[0].eventId == EVENT_ENGINE_STOP && recs[1].eventId == EVENT_LOW_OIL_PRES,
+                    "getRecentEvents order is oldest first");
+    }
 }
 
 // ============================================================================

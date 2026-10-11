@@ -1,6 +1,7 @@
 #include "StorageManager.h"
 #include <FS.h>
 #include <time.h>
+#include <algorithm>
 
 #define EVENTS_FILE_PATH "/events.csv"
 
@@ -130,4 +131,43 @@ void StorageManager::dumpEvents(Print &out) {
 
 uint32_t StorageManager::getEventCount() {
     return eventCount;
+}
+
+uint8_t StorageManager::getRecentEvents(EventRecord *out, uint8_t maxEvents) {
+    if (maxEvents == 0 || !SPIFFS.exists(EVENTS_FILE_PATH)) return 0;
+    File file = SPIFFS.open(EVENTS_FILE_PATH, FILE_READ);
+    if (!file) return 0;
+
+    // Keep the last maxEvents records in a ring buffer while streaming the file.
+    uint32_t total = 0;
+    char line[96];
+    size_t len = 0;
+    bool more = true;
+    while (more) {
+        int c = file.available() ? file.read() : -1;
+        if (c < 0) more = false;
+        if (c == '\n' || c < 0) {
+            line[len] = '\0';
+            unsigned int seq = 0, id = 0;
+            char name[48];
+            double hours = 0.0;
+            // Format: seq,event_id,event_name,engine_hours,...
+            if (len > 0 && sscanf(line, "%u,%u,%47[^,],%lf", &seq, &id, name, &hours) == 4) {
+                EventRecord &rec = out[total % maxEvents];
+                rec.eventId = (uint8_t)id;
+                rec.engineHours = hours;
+                total++;
+            }
+            len = 0;
+        } else if (len < sizeof(line) - 1) {
+            line[len++] = (char)c;
+        }
+    }
+    file.close();
+
+    if (total <= maxEvents) return (uint8_t)total;
+    // Rotate so the oldest retained record is first
+    uint8_t start = total % maxEvents;
+    std::rotate(out, out + start, out + maxEvents);
+    return maxEvents;
 }

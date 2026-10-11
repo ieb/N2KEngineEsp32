@@ -21,6 +21,14 @@ public:
     void dumpEvents(Print &out);
     uint32_t getEventCount();
 
+    struct EventRecord {
+        uint8_t eventId;
+        double engineHours;
+    };
+    // Reads the most recent events (oldest first) from the event log into out[].
+    // Returns the number of records written (<= maxEvents).
+    uint8_t getRecentEvents(EventRecord *out, uint8_t maxEvents);
+
 private:
     Preferences prefs;
     uint32_t engineHoursSeconds;

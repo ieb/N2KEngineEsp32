@@ -13,6 +13,7 @@ OneWireTemp::OneWireTemp()
 }
 
 void OneWireTemp::begin(uint8_t pin) {
+    oneWire.begin(pin);
     sensors.setOneWire(&oneWire);
     sensors.begin();
     sensors.setWaitForConversion(false);
@@ -45,7 +46,12 @@ void OneWireTemp::update() {
         if (now - lastRequestTime >= 1000) {
             for (uint8_t i = 0; i < activeCount; i++) {
                 float tempC = sensors.getTempC(deviceAddresses[i]);
-                if (tempC > -55.0f && tempC < 125.0f) {
+                // 85.0C is the DS18B20 power-on reset value: only accept it when the
+                // previous reading was already close (i.e. it is a genuine temperature).
+                bool powerOnValue = (tempC == 85.0f) &&
+                    (temperaturesK[i] == N2kDoubleNA ||
+                     fabs((temperaturesK[i] - 273.15) - 85.0) > 10.0);
+                if (tempC > -55.0f && tempC < 125.0f && !powerOnValue) {
                     temperaturesK[i] = (double)tempC + 273.15;
                 } else {
                     temperaturesK[i] = N2kDoubleNA;

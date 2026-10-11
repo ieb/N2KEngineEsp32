@@ -4,6 +4,8 @@
 #include <ADS1X15.h>
 #include "config.h"
 
+#define ADC_MAX_CONSECUTIVE_ERRORS 5
+
 struct AdcReadings {
     // ADC 1 (0x48)
     float ntc1ExhaustWaterTrap_V = 0.0f;
@@ -23,7 +25,7 @@ struct AdcReadings {
     float fuel_V                 = 0.0f;
     float spareVoltage_V         = 0.0f;
 
-    // Raw ADC counts (normalized to 0..4096 scale for lookup tables if needed)
+    // Raw ADC counts (ADS1115 counts, 0.1875 mV/bit)
     int16_t raw_ntc1             = 0;
     int16_t raw_ntc2             = 0;
     int16_t raw_ntc3             = 0;
@@ -57,6 +59,13 @@ private:
     uint8_t currentChannel;
     bool conversionPending;
     unsigned long conversionStartTime;
+
+    // Chip present at boot and consecutive read failures (ok flag drops after
+    // ADC_MAX_CONSECUTIVE_ERRORS so stale values are reported as N/A)
+    bool present[3];
+    uint8_t errorCount[3];
+    void readChip(uint8_t chip, ADS1115 &ads, bool ready);
+    bool &okFlag(uint8_t chip);
 
     // Exponential moving average filter (alpha = 0.25)
     float filter(float oldVal, float newVal, float alpha = 0.25f);

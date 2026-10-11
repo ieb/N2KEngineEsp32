@@ -23,6 +23,7 @@ AlarmManager::AlarmManager()
 bool AlarmManager::delayedTrigger(unsigned long &start, unsigned long windowMs) {
     if (start == 0) {
         start = millis();
+        if (start == 0) start = 1; // 0 is the "not started" sentinel
         return false;
     }
     return ((millis() - start) >= windowMs);
@@ -40,6 +41,12 @@ void AlarmManager::reset() {
     exhaustRiseAnchorTime = 0;
     exhaustRiseAnchor = 0;
     exhaustFlowTripped = false;
+    // Per-run event latches: an alarm active when the engine was stopped must be
+    // logged again if it recurs on the next run.
+    loggedStop = false;
+    loggedLowOil = false;
+    loggedHighCoolant = false;
+    loggedExhaustTemp = false;
 }
 
 void AlarmManager::update(EngineState &state, StorageManager &storage) {
@@ -48,16 +55,15 @@ void AlarmManager::update(EngineState &state, StorageManager &storage) {
     uint32_t utcTime = state.systemTimeUtc;
 
     // Track running transition
+    bool justStopped = false;
     if (state.isEngineRunning && !wasRunning) {
-        engineStartedTime = now;
-        canEmitAlarms = false;
-        wasRunning = true;
         reset();
         wasRunning = true;
         engineStartedTime = now;
     } else if (!state.isEngineRunning && wasRunning) {
         wasRunning = false;
         canEmitAlarms = false;
+        justStopped = true;
     }
 
     if (state.isEngineRunning && !canEmitAlarms) {
@@ -75,14 +81,17 @@ void AlarmManager::update(EngineState &state, StorageManager &storage) {
         s1 |= STATUS1_PREHEAT_INDICATOR;
     }
 
-    // 2. Engine Shutting Down
-    if (state.stopRelayActive || (state.isEngineStopping && state.engineRpm < ENGINE_SHUTDOWN_RPM)) {
+    // 2. Engine Shutting Down (stop relay energised, or RPM run-down to rest)
+    bool shuttingDown = state.stopRelayActive || state.isEngineStopping;
+    if (shuttingDown) {
         s2 |= STATUS2_ENGINE_SHUTTING_DOWN;
-        if (!loggedStop) {
-            storage.logEvent(EVENT_ENGINE_STOP, engineHours, utcTime);
-            loggedStop = true;
-        }
-    } else {
+    }
+    // Log one ENGINE_STOP event per run (latch cleared by reset() at next start),
+    // or once per stop-relay activation while the engine is not running.
+    if ((shuttingDown || justStopped) && !loggedStop) {
+        storage.logEvent(EVENT_ENGINE_STOP, engineHours, utcTime);
+        loggedStop = true;
+    } else if (!shuttingDown && !state.isEngineRunning && !justStopped) {
         loggedStop = false;
     }
 

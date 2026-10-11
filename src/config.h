@@ -12,7 +12,7 @@
 #define PIN_START_COIL      7
 #define PIN_I2C_SDA         8
 #define PIN_I2C_SCL         9
-#define PIN_ONE_WIRE        10
+#define PIN_ONE_WIRE        0
 
 // ============================================================================
 // I2C & ADS1115 Configuration
@@ -73,6 +73,16 @@
 #define FUEL_CAPACITY_LITRES        60.0
 
 // Alarm Thresholds & Windows
+// Coolant sender (1K pull-up to engine battery, BAT46 clamp to 5V on the sense node)
+// Sense node at/above the clamp means sender open-circuit or engine colder than measurable.
+#define COOLANT_CLAMP_V             4.9f
+// Normalised reading below this (~130C+) means a shorted sender / wire to block.
+#define COOLANT_SHORT_COUNTS        100
+// Plausible engine block offset window (V, relative to board 0V). Outside it the
+// block sense wire is treated as disconnected and no compensation is applied.
+#define ENGINE_BLOCK_OFFSET_MIN_V   (-2.0f)
+#define ENGINE_BLOCK_OFFSET_MAX_V   (0.5f)
+
 #define MAX_COOLANT_TEMP_DECI_C     970    // 97.0 C
 #define COOLANT_ALARM_WINDOW_MS     15000UL // 15s sustained
 
@@ -99,10 +109,10 @@
 // NMEA 2000 Configuration
 // ============================================================================
 #define N2K_DEFAULT_ADDRESS         24
-#define N2K_DEVICE_ID               223
+#define N2K_DEVICE_ID               223    // Fallback only; unique number is derived from the ESP32 MAC
 #define N2K_DEVICE_FUNCTION         140    // Engine
 #define N2K_DEVICE_CLASS            50     // Propulsion
-#define N2K_MANUFACTURER_CODE       2048
+#define N2K_MANUFACTURER_CODE       2046   // 11-bit field (max 2047); must match PROPRIETARY_CODE
 #define N2K_INDUSTRY_GROUP          4      // Marine
 
 // PGN Periods (in milliseconds)
@@ -120,10 +130,20 @@
 #define ALTERNATOR_BATTERY_INSTANCE 2
 #define FUEL_TANK_INSTANCE          0
 
+// Temperature sources / instances (PGN 130312 / 130316)
+#define TEMP_INSTANCE_EXHAUST_TRAP  0      // NTC1, Source 14 (Exhaust Gas)
+#define TEMP_INSTANCE_EXHAUST_ELBOW 1      // NTC5, Source 14 (Exhaust Gas)
+#define TEMP_SOURCE_ALTERNATOR      30     // NTC2
+#define TEMP_SOURCE_ONEWIRE_BASE    31     // 1-Wire sensor i -> 31 + i (i = 0..3)
+#define TEMP_SOURCE_GEARBOX         35     // NTC4
+
 // Proprietary PGNs
 #define PROPRIETARY_CODE            0x9FFE // Manufacturer 2046 + Marine bit
 #define PGN_PROPRIETARY_CMD         65305L
+#define PGN_PROPRIETARY_FAST        130817L
 #define FN_DUMP_EVENTS              11
+#define FN_DUMP_EVENTS_RESP         12
+#define MAX_DUMP_EVENTS             53     // (223 - 8 header bytes) / 4 bytes per record
 #define FN_CLEAR_EVENTS             13
 #define FN_CLEAR_EVENTS_RESP        14
 

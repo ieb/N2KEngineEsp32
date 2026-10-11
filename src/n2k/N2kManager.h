@@ -23,6 +23,16 @@ private:
     void sendTransmissionDynamic(const EngineState &state);
     void sendLegacyTemperatures(const EngineState &state);
     void sendExtendedTemperatures(const EngineState &state);
+    void sendClearEventsResponse();
+    void sendEventDump();
+
+    struct TempChannel {
+        uint8_t instance;
+        uint8_t source;
+        double kelvin;
+    };
+    static const uint8_t MAX_TEMP_CHANNELS = 9; // 5 NTC + 4 x 1-Wire
+    uint8_t collectTemperatures(const EngineState &state, TempChannel *out);
 
     tNMEA2000_esp32 n2k;
     StorageManager *storagePtr;
@@ -41,4 +51,5 @@ private:
 
     static StorageManager *s_storage;
     static EngineState *s_state;
+    static N2kManager *s_instance;
 };

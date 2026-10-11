@@ -33,11 +33,11 @@ The curcuit is defined in pcb/esp32board/esp32board.kicad_sch
 * Stop Relay Coil 10K/2K2 Divider
 * Start Relay Coil 10K/2K2 Divider
 * Glow Relay Coil 10K/2K2 Divider
-* 1 Wire GPIO10
+* 1 Wire GPIO0
 
 ## GPIO Connections
 
-* GPI0  1 Wire
+* GPIO0 1 Wire
 * GPIO1 CAN-RX
 * GPIO3 CAN-TX
 * GPIO4 Flywheel Pulse
@@ -148,7 +148,7 @@ To allow standard marine multifunction displays (MFDs) and dedicated instruments
 | **Alternator Voltage & Temperature** (ADC1 AIN3 & NTC2) | **127508** (Battery Status) | `Battery Instance 2` (Voltage & Temperature) | Alternator monitored as a dedicated battery source on battery status pages (Instance 0 = Engine Battery, Instance 1 reserved for Service Shunt). |
 | **Exhaust Temperature** (NTC1 / NTC5) | **130312** / **130316** (Temperature) | `Source 14` (`Exhaust Gas`) | Standard N2K exhaust temperature for compatible MFDs. |
 | **Engine Room Temperature** (NTC3) | **130312** / **130316** (Temperature) | `Source 3` (`Engine Room`) | Standard engine compartment temperature. |
-| **Alternator & 1-Wire Sensors** | **130312** / **130316** (Temperature) | `Source 30`, `31+i` (User/Custom Sources) | Custom temperature sources for auxiliary logging / MFD data pages. |
+| **Alternator, Gearbox & 1-Wire Sensors** | **130312** / **130316** (Temperature) | `Source 30` (Alternator), `35` (Gearbox), `31+i` (1-Wire) (User/Custom Sources) | Custom temperature sources for auxiliary logging / MFD data pages. |
 
 ---
 
@@ -156,8 +156,8 @@ To allow standard marine multifunction displays (MFDs) and dedicated instruments
 
 | PGN | Name | Frame Type | Priority | Rate | Condition |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **127488** | Engine Parameters, Rapid Update | Single frame (8 B) | 2 | 500 ms (0.1s ideal) | Engine running (RPM >= 800) |
-| **127489** | Engine Parameters, Dynamic | Fast packet (26 B) | 2 | 1000 ms (0.5s ideal) | Engine running (RPM >= 800) |
+| **127488** | Engine Parameters, Rapid Update | Single frame (8 B) | 2 | 500 ms (0.1s ideal) | Engine running (RPM >= 800) or shutting down |
+| **127489** | Engine Parameters, Dynamic | Fast packet (26 B) | 2 | 1000 ms (0.5s ideal) | Engine running (RPM >= 800) or shutting down |
 | **127493** | Transmission Parameters, Dynamic | Single frame (8 B) | 2 | ~4.85 s | Continuous |
 | **127508** | Battery Status | Single frame (8 B) | 6 | ~1.0 s | Continuous (Inst 0 & Inst 2) |
 | **127505** | Fluid Level (Fuel) | Single frame (8 B) | 6 | 2.5 s - 4.9 s | Continuous |
@@ -180,7 +180,7 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 
 ### 1. PGN 127488 – Engine Parameters, Rapid Update
 * **Transmission**: Single frame (8 bytes), broadcast (0xFF), Priority 2.
-* **Period**: 500 ms (nominally 100 ms). Sent only when engine is running (`RPM >= 800`).
+* **Period**: 500 ms (nominally 100 ms). Sent while the engine is running (`RPM >= 800`) and while shutting down (RPM run-down to rest, or stop relay active).
 
 | Byte | Field Name | Data Type | Units / Resolution | Value / Source |
 | :---: | :--- | :--- | :--- | :--- |
@@ -194,14 +194,14 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 
 ### 2. PGN 127489 – Engine Parameters, Dynamic
 * **Transmission**: Fast packet (26 data bytes), broadcast (0xFF), Priority 2.
-* **Period**: 1000 ms (nominally 500 ms). Sent only when engine is running (`RPM >= 800`).
+* **Period**: 1000 ms (nominally 500 ms). Sent while the engine is running (`RPM >= 800`) and while shutting down (RPM run-down to rest, or stop relay active), so the Engine Shutting Down flag reaches displays.
 
 | Byte | Field Name | Data Type | Units / Resolution | Value / Source |
 | :---: | :--- | :--- | :--- | :--- |
 | 0 | Engine Instance | `uint8` | 1 | `0` (`ENGINE_INSTANCE`) |
 | 1–2 | Engine Oil Pressure | `uint16` | 100 Pa / bit (hPa) | Measured from 0–5V oil pressure sensor (ADC2 AIN0). `0xFFFF` = N/A. |
 | 3–4 | **Engine Oil Temperature [REMAPPED]** | `uint16` | 0.1 K / bit | **Alternator Temperature** from NTC2 (ADC1 AIN1). Remapped so MFDs display alternator thermal load. `0xFFFF` = N/A. |
-| 5–6 | Engine Coolant Temperature | `uint16` | 0.01 K / bit | Coolant thermistor sensor (ADC2 AIN1). `0xFFFF` = N/A. |
+| 5–6 | Engine Coolant Temperature | `uint16` | 0.01 K / bit | Coolant sender (ADC2 AIN1). `0xFFFF` = N/A, also reported when the sender is open-circuit / below measurable range (sense node at the 5V clamp) or shorted. |
 | 7–8 | Alternator Potential (Voltage) | `int16` | 0.01 V / bit | Alternator voltage divider (ADC1 AIN3). `0x7FFF` = N/A. |
 | 9–10 | Fuel Rate | `int16` | 0.1 L/h / bit | `0x7FFF` (N/A) |
 | 11–14 | Total Engine Hours | `uint32` | 1 s / bit | Total accumulated runtime seconds when `RPM >= 800`. Stored in non-volatile memory. `0xFFFFFFFF` = N/A. |
@@ -243,7 +243,7 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 | 4 | `0x0010` | Engine Comm Error | Unused (`0`). |
 | 5 | `0x0020` | Sub / Secondary Throttle | Unused (`0`). |
 | 6 | `0x0040` | Neutral Start Protect | Unused (`0`). |
-| 7 | `0x0080` | Engine Shutting Down | RPM < 500 RPM while engine is stopping / Stop relay active (GPIO5). |
+| 7 | `0x0080` | Engine Shutting Down | Engine RPM run-down after dropping below 500 RPM (until rest) / Stop relay active (GPIO5). |
 
 ---
 
@@ -300,17 +300,18 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 | Byte | Field Name | Data Type | Units / Resolution | Value / Source |
 | :---: | :--- | :--- | :--- | :--- |
 | 0 | Sequence ID (SID) | `uint8` | 1 | Rolling sequence counter. |
-| 1 | Temperature Instance | `uint8` | 1 | `0` |
+| 1 | Temperature Instance | `uint8` | 1 | `0`, except Exhaust Elbow (NTC5) which uses `1` |
 | 2 | Temperature Source | `uint8` | Enum / ID | Source selector (see below). |
 | 3–4 | Actual Temperature | `uint16` | 0.01 K / bit | Measured sensor temperature in Kelvin. `0xFFFF` = N/A. |
 | 5–6 | Set / Requested Temperature | `uint16` | 0.01 K / bit | `0xFFFF` (N/A) |
 | 7 | Reserved | `uint8` | — | `0xFF` |
 
 #### Temperature Sources Emitted
-* **Source 14 (`Exhaust Gas`)**: Exhaust Water Trap (NTC1) or Exhaust Elbow (NTC5).
+* **Source 14 (`Exhaust Gas`)**: Exhaust Water Trap (NTC1, instance 0) and Exhaust Elbow (NTC5, instance 1).
 * **Source 3 (`Engine Room`)**: Engine compartment air temperature (NTC3).
 * **Source 30 (Custom / Manufacturer)**: Alternator temperature (NTC2).
-* **Source 31+i (Custom / Manufacturer)**: Auxiliary 1-Wire Dallas DS18B20 digital temperature sensors (GPIO10).
+* **Source 31+i (Custom / Manufacturer)**: Auxiliary 1-Wire Dallas DS18B20 digital temperature sensors (GPIO0), i = 0..3.
+* **Source 35 (Custom / Manufacturer)**: Gearbox temperature (NTC4).
 
 ---
 
@@ -321,7 +322,7 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 | Byte | Field Name | Data Type | Units / Resolution | Value / Source |
 | :---: | :--- | :--- | :--- | :--- |
 | 0 | Sequence ID (SID) | `uint8` | 1 | Rolling sequence counter. |
-| 1 | Temperature Instance | `uint8` | 1 | Instance ID (e.g. `0`). |
+| 1 | Temperature Instance | `uint8` | 1 | Instance ID (as for PGN 130312). |
 | 2 | Temperature Source | `uint8` | Enum | Source selector (matches standard N2K temperature sources). |
 | 3–5 | Actual Temperature | `uint24` | 0.001 K / bit | High-resolution temperature in Kelvin. `0xFFFFFF` = N/A. |
 | 6–7 | Set Temperature | `uint16` | 0.1 K / bit | `0xFFFF` (N/A). |
@@ -366,7 +367,7 @@ Used for interrogating fault history and resetting stored engine trip alarms ove
 * **PGN 59392 (ISO Acknowledgment)**: Positive / negative acknowledgment of ISO requests.
 * **PGN 59904 (ISO Request)**: Polls for specific PGNs (Address Claim, Product Info, PGN List, etc.).
 * **PGN 60928 (ISO Address Claim)**: 64-bit NAME structure containing:
-  * Unique ID (serial number 21 bits), Manufacturer Code 2048 (11 bits)
+  * Unique ID (serial number 21 bits, derived from the ESP32 MAC), Manufacturer Code 2046 (11 bits, matches the proprietary code)
   * Device Instance: `0` (or dynamically reassigned on collision)
   * Device Function: `140` (`Engine`)
   * Device Class: `50` (`Propulsion`)
