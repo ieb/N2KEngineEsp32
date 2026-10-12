@@ -169,6 +169,15 @@
 #define FN_CLEAR_EVENTS             13
 #define FN_CLEAR_EVENTS_RESP        14
 
+// Persistence (see StorageManager.h). Flash is not written while the engine is
+// running; engine hours and events are mirrored in RTC memory and flushed when
+// the stop relay is energised, when the engine stops and before a restart.
+// Backstop save of engine hours while running, against an abnormal power cut
+// (board power normally stays on 30-60 s after shutdown). 0 disables.
+#define ENGINE_HOURS_BACKSTOP_SAVE_S 3600
+// Alarm events buffered in RTC memory while the engine is running
+#define MAX_PENDING_EVENTS          32
+
 // Event IDs
 #define EVENT_NONE                  0
 #define EVENT_ENGINE_STOP           1

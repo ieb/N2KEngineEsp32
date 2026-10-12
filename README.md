@@ -123,6 +123,7 @@ I2C Bus (SDA/SCL) ->| GPIO8 / GPIO9                      |
 The flash memory uses a **2MB Application / 2MB SPIFFS** partition layout (`src/no_ota.csv`):
 * **Engine Hours Accumulator**: Accumulated per second while $\text{RPM} \ge 800$, committed to wear-leveled NVS Preferences.
 * **Persistent Event History**: Historical alarms are appended to `/events.csv` on the SPIFFS filesystem.
+* **No flash writes while the engine runs**: flash writes stall non-IRAM interrupts (CAN today, BLE later) for up to tens of ms during a sector erase. While running, engine hours and alarm events are held in RTC no-init memory (survives crashes, watchdog resets and restarts) and written to flash when the stop relay is energised, when the engine stops and before a CLI restart. A valid RTC copy that is ahead of flash is recovered at boot. A backstop save of engine hours every `ENGINE_HOURS_BACKSTOP_SAVE_S` (default 3600 s, 0 disables) protects against an abnormal power cut; board power normally stays on 30–60 s after shutdown. Alarm flags are still sent immediately in PGN 127489. Setting hours (`E`) and clearing events (`C` / N2K command) write immediately.
 * **GPS UTC Synchronization**: Automatically synchronizes timestamps when NMEA 2000 System Time (**PGN 126992**) is received from on-bus GPS receivers.
 
 ---

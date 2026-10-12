@@ -33,7 +33,7 @@ EngineState      engineState;
 bool adcDebugOutput = false;
 unsigned long lastHoursTick = 0;
 unsigned long lastStatusPrint = 0;
-bool wasEngineRunning = false;
+bool wasStopRelayActive = false;
 
 // Non-blocking line entry for the 'E' (set engine hours) command
 bool hoursEntryActive = false;
@@ -199,7 +199,7 @@ void handleCli() {
             break;
         case 'R':
             Serial.println(F("Restarting..."));
-            storageManager.saveEngineHoursIfNeeded(true);
+            storageManager.flush();
             delay(100);
             ESP.restart();
             break;
@@ -260,11 +260,14 @@ void loop() {
             engineState.engineHoursSeconds = storageManager.getEngineHoursSeconds();
         }
     }
-    // Persist hours as soon as the engine stops (power is often cut right after)
-    if (wasEngineRunning && !engineState.isEngineRunning) {
-        storageManager.saveEngineHoursIfNeeded(true);
+    // No flash writes while the engine runs (flash writes stall CAN and, later,
+    // BLE interrupts). Hours and events are held in RTC memory and flushed when
+    // the stop relay is energised and again when the engine stops.
+    if (engineState.stopRelayActive && !wasStopRelayActive) {
+        storageManager.flush();
     }
-    wasEngineRunning = engineState.isEngineRunning;
+    wasStopRelayActive = engineState.stopRelayActive;
+    storageManager.setDeferWrites(engineState.isEngineRunning); // false edge flushes
 
     // 4. Alarm evaluation & persistent event logging
     alarmManager.update(engineState, storageManager);

@@ -502,6 +502,107 @@ void run_rpm_sensor_tests() {
     }
 }
 
+// ============================================================================
+// 5. PERSISTENCE: NO FLASH WRITES WHILE RUNNING, RTC RECOVERY
+// ============================================================================
+static int countEventLines() {
+    FILE *f = fopen("events.csv", "r");
+    if (!f) return 0;
+    int n = 0, c;
+    while ((c = fgetc(f)) != EOF) if (c == '\n') n++;
+    fclose(f);
+    return n;
+}
+
+void run_persistence_tests() {
+    printf("\n=== Running Persistence Tests ===\n");
+    Preferences::clearAll();
+    StorageManager::resetRtcState();
+    remove("events.csv");
+    set_simulated_millis(5000000);
+
+    {
+        StorageManager sm;
+        sm.begin();
+        sm.setEngineHoursSeconds(7200);
+
+        // Engine running: an hour of ticks and two alarms, no flash writes
+        sm.setDeferWrites(true);
+        uint32_t writesBefore = Preferences::s_writeCount;
+        for (int i = 0; i < 3500; i++) {
+            advance_simulated_millis(1000);
+            sm.tickEngineHours(1);
+        }
+        sm.logEvent(EVENT_LOW_OIL_PRES, sm.getEngineHoursSeconds() / 3600.0, 0);
+        sm.logEvent(EVENT_HIGH_COOLANT, sm.getEngineHoursSeconds() / 3600.0, 0);
+        TEST_ASSERT(Preferences::s_writeCount == writesBefore, "No NVS writes while running (< backstop interval)");
+        TEST_ASSERT(countEventLines() == 0, "No SPIFFS writes while running");
+        TEST_ASSERT(sm.getPendingEventCount() == 2, "Two events pending in RTC memory");
+        TEST_ASSERT(sm.getEventCount() == 2, "Event count includes pending events");
+
+        StorageManager::EventRecord recs[4];
+        TEST_ASSERT(sm.getRecentEvents(recs, 4) == 2, "Event dump includes pending events");
+
+        // Backstop save after ENGINE_HOURS_BACKSTOP_SAVE_S
+        for (int i = 0; i < 200; i++) {
+            advance_simulated_millis(1000);
+            sm.tickEngineHours(1);
+        }
+        TEST_ASSERT(Preferences::s_writeCount == writesBefore + 1, "Single backstop NVS save after the backstop interval");
+
+        // Engine stops: everything flushed
+        sm.setDeferWrites(false);
+        TEST_ASSERT(countEventLines() == 2, "Pending events written when engine stops");
+        TEST_ASSERT(sm.getPendingEventCount() == 0, "No pending events after flush");
+    }
+
+    // Reboot (power cycle: RTC invalid) -> values come from NVS
+    {
+        uint32_t expectedHours = 7200 + 3700;
+        StorageManager::resetRtcState();
+        StorageManager sm;
+        sm.begin();
+        TEST_ASSERT(sm.getEngineHoursSeconds() == expectedHours, "Engine hours persisted to NVS at stop");
+        TEST_ASSERT(sm.getEventCount() == 2, "Event count persisted at stop");
+    }
+
+    // Crash while running: RTC copy survives, NVS is stale
+    {
+        StorageManager sm;
+        sm.begin();
+        uint32_t base = sm.getEngineHoursSeconds();
+        sm.setDeferWrites(true);
+        for (int i = 0; i < 600; i++) {
+            advance_simulated_millis(1000);
+            sm.tickEngineHours(1);
+        }
+        sm.logEvent(EVENT_EXHAUST_TEMP, sm.getEngineHoursSeconds() / 3600.0, 0);
+        // ... crash: no flush, StorageManager discarded, RTC memory retained
+
+        StorageManager after;
+        after.begin();
+        TEST_ASSERT(after.getEngineHoursSeconds() == base + 600, "Engine hours recovered from RTC after crash");
+        TEST_ASSERT(after.getEventCount() == 3, "Event count recovered from RTC after crash");
+        TEST_ASSERT(countEventLines() == 3, "Pending event written to flash at boot after crash");
+        TEST_ASSERT(after.getPendingEventCount() == 0, "No pending events after recovery");
+    }
+
+    // Corrupt RTC memory is ignored
+    {
+        uint32_t nvsHours;
+        {
+            StorageManager sm;
+            sm.begin();
+            nvsHours = sm.getEngineHoursSeconds();
+        }
+        StorageManager::resetRtcState(); // magic/checksum invalid, as after power-on
+        StorageManager sm;
+        sm.begin();
+        TEST_ASSERT(sm.getEngineHoursSeconds() == nvsHours, "Invalid RTC block ignored");
+    }
+    remove("events.csv");
+}
+
 int main() {
     printf("==================================================\n");
     printf("  N2KEngineEsp32 Native Local Unit Test Suite\n");
@@ -511,6 +612,7 @@ int main() {
     run_alarm_manager_tests();
     run_storage_tests();
     run_rpm_sensor_tests();
+    run_persistence_tests();
 
     printf("\n==================================================\n");
     printf("Test Results: %d / %d passed", g_tests_passed, g_tests_run);
