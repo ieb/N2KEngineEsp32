@@ -122,7 +122,7 @@ double SensorProcessing::convertFuelLevel(float voltage) {
 
 void SensorProcessing::update(EngineState &state,
                              const AdcReadings &adc,
-                             const RpmSensor &rpm,
+                             const RpmSensorBase &rpm,
                              const RelayCoilStates &relays,
                              const OneWireTemp &oneWire) {
     // 1. Speeds & Relays

@@ -41,6 +41,25 @@
 #define FLYWHEEL_READ_PERIOD_MS     100
 #define ENGINE_START_GRACE_PERIOD   15000UL // 15s grace before alarming
 
+// RPM sensor implementation: 0 = window counting (RpmSensor),
+// 1 = edge timing averaged over whole revolutions (EdgeRpmSensor)
+#ifndef RPM_SENSOR_EDGE_TIMING
+#define RPM_SENSOR_EDGE_TIMING      1
+#endif
+// Edge timing: reject edges closer than this (glitches; 150us == 13,333 RPM)
+#define RPM_EDGE_MIN_PERIOD_US      150UL
+// Edge timing: no edge for this long means the flywheel has stopped
+#define RPM_EDGE_ZERO_TIMEOUT_US    500000UL
+// Edge timing: if a full revolution has not completed within this time (very low
+// RPM, start-up, run-down), compute from the edges seen so far instead of waiting.
+#define RPM_EDGE_PARTIAL_TIMEOUT_US 250000UL
+
+// Bench test signal (LEDC square wave). Wire GPIO2 -> 1K -> GPIO4 and short the
+// flywheel input (J15) so the LM393 output is released. GPIO2 is a strapping pin;
+// the 10K pull-up on GPIO4 keeps it high at boot as required.
+#define PIN_BENCH_SIGNAL            2
+#define BENCH_LEDC_CHANNEL          0
+
 // ============================================================================
 // Resistor Dividers & Calibrations
 // ============================================================================

@@ -3,6 +3,8 @@
 #include "config.h"
 #include "hal/AdcManager.h"
 #include "hal/RpmSensor.h"
+#include "hal/EdgeRpmSensor.h"
+#include "hal/BenchSignal.h"
 #include "hal/DigitalInputs.h"
 #include "hal/OneWireTemp.h"
 #include "sensors/EngineState.h"
@@ -13,7 +15,12 @@
 
 // System Components
 AdcManager       adcManager;
+#if RPM_SENSOR_EDGE_TIMING
+EdgeRpmSensor    rpmSensor;
+#else
 RpmSensor        rpmSensor;
+#endif
+BenchSignal      benchSignal;
 DigitalInputs    digitalInputs;
 OneWireTemp      oneWireTemp;
 StorageManager   storageManager;
@@ -117,6 +124,8 @@ void showHelp() {
     Serial.println(F("  'l' - Dump SPIFFS event history"));
     Serial.println(F("  'C' - Clear SPIFFS event history"));
     Serial.println(F("  'd' - Toggle raw ADC readings output"));
+    Serial.printf("  'T' - Cycle bench RPM test signal on GPIO%d (off/100/400/1500 Hz), sensor: %s\n",
+                  PIN_BENCH_SIGNAL, rpmSensor.name());
     Serial.println(F("  'R' - Restart ESP32"));
 }
 
@@ -185,6 +194,9 @@ void handleCli() {
             adcDebugOutput = !adcDebugOutput;
             Serial.printf("[DEBUG] ADC Debug output: %s\n", adcDebugOutput ? "ENABLED" : "DISABLED");
             break;
+        case 'T':
+            benchSignal.cycle();
+            break;
         case 'R':
             Serial.println(F("Restarting..."));
             storageManager.saveEngineHoursIfNeeded(true);
@@ -242,7 +254,8 @@ void loop() {
         } else {
             lastHoursTick += 1000;
         }
-        if (engineState.isEngineRunning) {
+        // Bench test signal looks like a running engine: do not accumulate hours
+        if (engineState.isEngineRunning && !benchSignal.isActive()) {
             storageManager.tickEngineHours(1);
             engineState.engineHoursSeconds = storageManager.getEngineHoursSeconds();
         }
@@ -261,6 +274,8 @@ void loop() {
 
     // 6. Interactive CLI & periodic diagnostics
     handleCli();
+
+    benchSignal.update(rpmSensor);
 
     if (adcDebugOutput && (now - lastStatusPrint >= 2000)) {
         lastStatusPrint = now;

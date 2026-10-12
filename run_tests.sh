@@ -8,7 +8,9 @@ clang++ -std=c++17 -Wall -Wextra -Wno-unused-parameter \
     src/alarms/AlarmManager.cpp \
     src/storage/StorageManager.cpp \
     src/hal/AdcManager.cpp \
+    src/hal/RpmSensorBase.cpp \
     src/hal/RpmSensor.cpp \
+    src/hal/EdgeRpmSensor.cpp \
     src/hal/DigitalInputs.cpp \
     src/hal/OneWireTemp.cpp \
     test/test_main.cpp \

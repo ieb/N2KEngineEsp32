@@ -3,7 +3,7 @@
 #include "config.h"
 #include "EngineState.h"
 #include "hal/AdcManager.h"
-#include "hal/RpmSensor.h"
+#include "hal/RpmSensorBase.h"
 #include "hal/DigitalInputs.h"
 #include "hal/OneWireTemp.h"
 
@@ -12,7 +12,7 @@ public:
     SensorProcessing();
     void update(EngineState &state,
                 const AdcReadings &adc,
-                const RpmSensor &rpm,
+                const RpmSensorBase &rpm,
                 const RelayCoilStates &relays,
                 const OneWireTemp &oneWire);
 

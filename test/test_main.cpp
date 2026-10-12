@@ -12,6 +12,7 @@
 #include "storage/StorageManager.h"
 #include "hal/AdcManager.h"
 #include "hal/RpmSensor.h"
+#include "hal/EdgeRpmSensor.h"
 #include "hal/DigitalInputs.h"
 #include "hal/OneWireTemp.h"
 
@@ -384,6 +385,123 @@ void run_storage_tests() {
     TEST_ASSERT(sm.getEventCount() == 2, "Event count after second log is 2");
 }
 
+// ============================================================================
+// 4. RPM SENSOR COMPARISON TESTS
+// ============================================================================
+struct RpmStats { double mean, minV, maxV, sd; int n; };
+
+// Simulates a square wave of freqHz for durationMs in 1 ms loop steps, feeding
+// edges to the given sensor and sampling getRpm() after a 500 ms settle time.
+// The main loop is modelled with a deterministic pseudo-random 1..6 ms period
+// (sensor reads, I2C, N2K traffic make the real loop irregular).
+static RpmStats simulateRpm(RpmSensorBase &sensor, bool edgeImpl, double freqHz,
+                            unsigned long startMs, unsigned long durationMs) {
+    double periodUs = 1.0e6 / freqHz;
+    double nextEdgeUs = (double)startMs * 1000.0 + periodUs * 0.37;
+    RpmStats st = {0, 1e9, -1e9, 0, 0};
+    double sumSq = 0.0;
+    uint32_t lcg = 12345;
+    uint32_t jit = 777;
+    unsigned long t = startMs;
+    while (t < startMs + durationMs) {
+        lcg = lcg * 1103515245u + 12345u;
+        t += 1 + ((lcg >> 16) % 6);
+        set_simulated_millis(t);
+        double limitUs = (double)t * 1000.0;
+        while (nextEdgeUs < limitUs) {
+            if (edgeImpl) {
+                // Model 0..8 us of interrupt latency (other ISRs, TWAI, flash cache)
+                jit = jit * 1103515245u + 12345u;
+                EdgeRpmSensor::recordEdge((uint32_t)(nextEdgeUs + 0.5) + ((jit >> 16) % 9));
+            } else {
+                RpmSensor::isrHandler();
+            }
+            nextEdgeUs += periodUs;
+        }
+        sensor.update();
+        if (t - startMs >= 1000) {
+            double r = sensor.getRpm();
+            st.mean += r; sumSq += r * r; st.n++;
+            if (r < st.minV) st.minV = r;
+            if (r > st.maxV) st.maxV = r;
+        }
+    }
+    st.mean /= st.n;
+    double var = sumSq / st.n - st.mean * st.mean;
+    st.sd = var > 0 ? sqrt(var) : 0;
+    return st;
+}
+
+void run_rpm_sensor_tests() {
+    printf("\n=== Running RPM Sensor Tests ===\n");
+    // Deliberately not round numbers: ~203, ~807 and ~2995 RPM
+    const double freqs[] = {101.37, 403.71, 1497.29};
+    unsigned long t0 = 1000000;
+
+    printf("  %-13s %8s %10s %10s %10s %8s\n", "impl", "expect", "mean", "min", "max", "sd");
+    for (double f : freqs) {
+        double expected = f * RPM_FACTOR;
+
+        EdgeRpmSensor::resetIsrState();
+        EdgeRpmSensor edge;
+        set_simulated_millis(t0);
+        edge.begin();
+        RpmStats e = simulateRpm(edge, true, f, t0, 3000);
+        t0 += 10000;
+
+        RpmSensor win;
+        set_simulated_millis(t0);
+        win.begin();
+        RpmStats w = simulateRpm(win, false, f, t0, 3000);
+        t0 += 10000;
+
+        printf("  %-13s %8.1f %10.2f %10.2f %10.2f %8.2f\n", edge.name(), expected, e.mean, e.minV, e.maxV, e.sd);
+        printf("  %-13s %8.1f %10.2f %10.2f %10.2f %8.2f\n", win.name(), expected, w.mean, w.minV, w.maxV, w.sd);
+
+        // 8 us latency jitter over one revolution (20 ms at 3000 RPM) is <= 0.04%
+        TEST_ASSERT_NEAR(e.minV, expected, expected * 0.0005, "Edge timing min within 0.05%");
+        TEST_ASSERT_NEAR(e.maxV, expected, expected * 0.0005, "Edge timing max within 0.05%");
+        TEST_ASSERT_NEAR(w.mean, expected, 25.0, "Window counting mean within 25 RPM");
+    }
+
+    // Glitch rejection: a spurious edge 50 us after a real one is ignored
+    {
+        EdgeRpmSensor::resetIsrState();
+        EdgeRpmSensor edge;
+        set_simulated_millis(t0);
+        edge.begin();
+        simulateRpm(edge, true, 400.0, t0, 1000);
+        uint32_t lastUs = (uint32_t)((double)t0 * 1000.0); // any time; only the gap matters
+        (void)lastUs;
+        unsigned long now = t0 + 1000;
+        EdgeRpmSensor::recordEdge((uint32_t)(now * 1000UL) - 10);
+        EdgeRpmSensor::recordEdge((uint32_t)(now * 1000UL) + 40);
+        TEST_ASSERT(edge.getGlitchCount() == 1, "Edge timing rejects edge closer than min period");
+        t0 += 10000;
+    }
+
+    // Run-down and stop: running -> stopping -> stopped after pulses cease
+    {
+        EdgeRpmSensor::resetIsrState();
+        EdgeRpmSensor edge;
+        set_simulated_millis(t0);
+        edge.begin();
+        simulateRpm(edge, true, 400.0, t0, 1000);
+        TEST_ASSERT(edge.isEngineRunning(), "Edge timing: running at 800 RPM");
+        // Run down through 400 RPM, then pulses stop
+        simulateRpm(edge, true, 200.0, t0 + 1000, 1000);
+        TEST_ASSERT(edge.isEngineStopping(), "Edge timing: stopping state during run-down");
+        unsigned long t = t0 + 2000;
+        for (int i = 0; i < 700; i++) {
+            set_simulated_millis(++t);
+            edge.update();
+        }
+        TEST_ASSERT(edge.getRpm() == 0.0 && !edge.isEngineRunning() && !edge.isEngineStopping(),
+                    "Edge timing: RPM 0 and stopped after pulses cease");
+        t0 += 10000;
+    }
+}
+
 int main() {
     printf("==================================================\n");
     printf("  N2KEngineEsp32 Native Local Unit Test Suite\n");
@@ -392,6 +510,7 @@ int main() {
     run_sensor_processing_tests();
     run_alarm_manager_tests();
     run_storage_tests();
+    run_rpm_sensor_tests();
 
     printf("\n==================================================\n");
     printf("Test Results: %d / %d passed", g_tests_passed, g_tests_run);

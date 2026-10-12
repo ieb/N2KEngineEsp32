@@ -12,9 +12,9 @@ This project provides an open, high-reliability NMEA 2000 marine engine interfac
                     |                                    |
 Flywheel Sensor --->| GPIO4 (Pulse Interrupt)            |
 Stop Relay      --->| GPIO5 (Coil Sense)                 |
-Start Relay     --->| GPIO6 (Coil Sense)                 |
-Glow Relay      --->| GPIO7 (Coil Sense)                 |
-1-Wire DS18B20  --->| GPIO10 (Dallas Temp Bus)           |
+Glow Relay      --->| GPIO6 (Coil Sense)                 |
+Start Relay     --->| GPIO7 (Coil Sense)                 |
+1-Wire DS18B20  --->| GPIO0 (Dallas Temp Bus)            |
                     |                                    |
 I2C Bus (SDA/SCL) ->| GPIO8 / GPIO9                      |
                     +-----+------------------------+-----+
@@ -45,15 +45,16 @@ I2C Bus (SDA/SCL) ->| GPIO8 / GPIO9                      |
 
 | Pin | Peripheral | Purpose |
 | :--- | :--- | :--- |
+| **GPIO0** | 1-Wire | Dallas DS18B20 digital temperature bus (4K7 pull-up to 3V3) |
 | **GPIO1** | CAN-RX | ESP32 TWAI CAN bus receive |
 | **GPIO3** | CAN-TX | ESP32 TWAI CAN bus transmit |
-| **GPIO4** | Pulse Input | Flywheel magnetic pickup (30 teeth per revolution) |
-| **GPIO5** | Digital Input | Stop Relay Coil (10k / 2.2k + LED divider from 12V) |
-| **GPIO6** | Digital Input | Start Relay Coil (10k / 2.2k + LED divider from 12V) |
-| **GPIO7** | Digital Input | Glow Plug Relay Coil (10k / 2.2k + LED divider from 12V) |
+| **GPIO2** | Bench Output | Optional LEDC test signal for RPM bench testing (CLI `T`) |
+| **GPIO4** | Pulse Input | Flywheel reactive pickup via LM393 comparator (30 teeth per revolution) |
+| **GPIO5** | Digital Input | Stop Relay Coil (10k / 4.7k divider from 12V, BAT46 clamp to 3V3) |
+| **GPIO6** | Digital Input | Glow Plug Relay Coil (10k / 4.7k divider from 12V, BAT46 clamp to 3V3) |
+| **GPIO7** | Digital Input | Start Relay Coil (10k / 4.7k divider from 12V, BAT46 clamp to 3V3) |
 | **GPIO8** | I2C SDA | 400 kHz I2C data to 3x ADS1115 ADCs |
 | **GPIO9** | I2C SCL | 400 kHz I2C clock to 3x ADS1115 ADCs |
-| **GPIO10** | 1-Wire | Dallas DS18B20 digital temperature bus |
 
 ### ADC Mapping (3x ADS1115 @ 5V, 64 SPS)
 * **ADC1 (`0x48`, Addr $\to$ GND)**:
@@ -78,6 +79,12 @@ I2C Bus (SDA/SCL) ->| GPIO8 / GPIO9                      |
 
 1. **Engine Speed (RPM)**:
    * Computed from flywheel pulses: $\text{RPM} = \text{Hz} \times 2.0$.
+   * Two implementations, selected with `RPM_SENSOR_EDGE_TIMING` in `src/config.h`:
+     * **Edge timing** (`EdgeRpmSensor`, default): the ISR timestamps edges (1 µs) and RPM is computed over whole revolutions, giving a new value every revolution with accuracy limited only by interrupt latency jitter (~0.01–0.04%). Registered as an IRAM interrupt so pulses are not lost during flash writes; edges closer than 150 µs are rejected as glitches.
+     * **Window counting** (`RpmSensor`): counts pulses over a ~100 ms window; ±1 pulse (±20 RPM) quantisation plus `millis()` jitter.
+   * The ESP32-C3 has no PCNT (pulse counter) peripheral, so hardware counting is not available on this board.
+   * The native tests print a side-by-side comparison of both implementations; on the board use the `T` bench signal.
+   * Details, measurements and caveats: [docs/rpm_measurement.md](docs/rpm_measurement.md).
    * Engine is considered **Running** when $\text{RPM} \ge 800$ and **Stopping** when $\text{RPM} < 500$.
 2. **10K NTC Thermistors (NTC1–NTC5)**:
    * Converted analytically using the exact Beta parameter model ($\frac{1}{T} = \frac{1}{T_0} + \frac{1}{\beta} \ln\left(\frac{R}{R_0}\right)$ with $R_0 = 10000\,\Omega$, $T_0 = 298.15\text{ K}$, $\beta = 3950\text{ K}$, $R_{\text{top}} = 4700\,\Omega$).
@@ -147,6 +154,7 @@ Connect to the USB Serial port at **115200 baud** for real-time monitoring and c
 * `l` — Dump SPIFFS alarm event log
 * `C` — Clear SPIFFS event history
 * `d` — Toggle raw ADC voltage debug stream
+* `T` — Cycle the RPM bench test signal on GPIO2 (off → 100 Hz → 400 Hz → 1500 Hz) and print min/mean/max/std-dev of the measured RPM every 2 s. Wire GPIO2 → 1K → GPIO4 and short the flywheel input (J15) so the LM393 output is released. Build once with each `RPM_SENSOR_EDGE_TIMING` setting to compare.
 * `R` — Software restart of the ESP32-C3
 
 ---

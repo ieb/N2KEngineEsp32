@@ -10,14 +10,8 @@ void IRAM_ATTR RpmSensor::isrHandler() {
 
 RpmSensor::RpmSensor()
     : pin(PIN_FLYWHEEL),
-      currentRpm(0.0),
-      engineRunning(false),
-      engineStopping(false),
-      fakeActive(false),
-      fakeRpm(1000.0),
       lastCalcTime(0),
-      lastPulseCount(0),
-      engineStartedTime(0) {
+      lastPulseCount(0) {
 }
 
 void RpmSensor::begin(uint8_t pin) {
@@ -46,56 +40,13 @@ void RpmSensor::update() {
     lastPulseCount = pulses;
     lastCalcTime = now;
 
-    if (fakeActive) {
-        currentRpm = fakeRpm;
-    } else if ((micros() - lastPulseUs) > 500000UL) {
+    double rpm;
+    if ((micros() - lastPulseUs) > 500000UL) {
         // If no pulse received for > 500ms, RPM is 0
-        currentRpm = 0.0;
+        rpm = 0.0;
     } else {
         double freqHz = (double)deltaPulses * 1000.0 / (double)dt;
-        currentRpm = freqHz * RPM_FACTOR;
+        rpm = freqHz * RPM_FACTOR;
     }
-
-    // Evaluate running vs stopping states
-    if (currentRpm >= MIN_ENGINE_RUNNING_RPM) {
-        if (!engineRunning) {
-            engineRunning = true;
-            engineStopping = false;
-            engineStartedTime = now;
-            Serial.printf("[RPM] Engine RUNNING (%.1f RPM)\n", currentRpm);
-        }
-    } else if (currentRpm < ENGINE_SHUTDOWN_RPM) {
-        if (engineRunning) {
-            engineRunning = false;
-            engineStopping = true;
-            Serial.printf("[RPM] Engine STOPPING (%.1f RPM)\n", currentRpm);
-        }
-        // Stopping lasts until the flywheel has come to rest
-        if (engineStopping && currentRpm <= 0.0) {
-            engineStopping = false;
-            Serial.println(F("[RPM] Engine STOPPED"));
-        }
-    }
-}
-
-double RpmSensor::getRpm() const {
-    return currentRpm;
-}
-
-bool RpmSensor::isEngineRunning() const {
-    return engineRunning;
-}
-
-bool RpmSensor::isEngineStopping() const {
-    return engineStopping;
-}
-
-void RpmSensor::toggleFakeRpm(double fakeValue) {
-    fakeActive = !fakeActive;
-    fakeRpm = fakeValue;
-    if (fakeActive) {
-        Serial.printf("[RPM] Fake RPM ENABLED: %.0f RPM\n", fakeRpm);
-    } else {
-        Serial.println(F("[RPM] Fake RPM DISABLED"));
-    }
+    setMeasuredRpm(rpm, now);
 }
