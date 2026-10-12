@@ -87,6 +87,9 @@
 #define COOLANT_ALARM_WINDOW_MS     15000UL // 15s sustained
 
 #define LOW_BATTERY_VOLTAGE         11.8   // V
+// Engine battery is measured on the ignition-switched feed (J14.4). Below this the
+// feed is considered off and the voltage is reported as N/A rather than ~0V.
+#define ENGINE_BATTERY_OFF_V        3.0    // V
 #define LOW_ALTERNATOR_VOLTAGE      12.2   // V
 #define VOLTAGE_ALARM_WINDOW_MS     5000UL // 5s sustained
 #define OIL_PRESS_ALARM_WINDOW_MS   5000UL // 5s sustained

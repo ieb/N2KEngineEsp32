@@ -162,6 +162,13 @@ void run_sensor_processing_tests() {
         sp.update(st, adc, rpm, relays, ow);
         TEST_ASSERT_NEAR(st.coolantTempK - 273.15, 60.0, 1.5, "Coolant ignores implausible block offset");
 
+        // Ignition off: switched battery feed ~0V reports N/A, and coolant is N/A too
+        adc.engineBattery_V = 0.01f;
+        adc.engineBlock_V = 2.5f;
+        sp.update(st, adc, rpm, relays, ow);
+        TEST_ASSERT(st.engineBatteryVoltage == N2kDoubleNA, "Switched battery feed off reports N/A");
+        TEST_ASSERT(st.coolantTempK == N2kDoubleNA, "Coolant N/A with battery feed off");
+
         AdcReadings missing; // all chips absent
         sp.update(st, missing, rpm, relays, ow);
         TEST_ASSERT(st.engineBatteryVoltage == N2kDoubleNA, "Missing ADC2: battery voltage N/A");

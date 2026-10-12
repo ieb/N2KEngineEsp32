@@ -151,6 +151,9 @@ void SensorProcessing::update(EngineState &state,
     // 3. Electrical Voltages (N/A when the ADC chip is missing or failing)
     state.alternatorVoltage = adc.adc1Ok ? adc.alternatorVoltage_V * VOLTAGE_SCALE_ALTERNATOR : N2kDoubleNA;
     state.engineBatteryVoltage = adc.adc2Ok ? adc.engineBattery_V * VOLTAGE_SCALE : N2kDoubleNA;
+    if (state.engineBatteryVoltage != N2kDoubleNA && state.engineBatteryVoltage < ENGINE_BATTERY_OFF_V) {
+        state.engineBatteryVoltage = N2kDoubleNA; // switched feed off (ignition off)
+    }
     state.spareVoltage = adc.adc3Ok ? adc.spareVoltage_V * VOLTAGE_SCALE : N2kDoubleNA;
 
     // 4. Temperatures

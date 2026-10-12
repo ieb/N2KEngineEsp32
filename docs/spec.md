@@ -20,9 +20,9 @@ The curcuit is defined in pcb/esp32board/esp32board.kicad_sch
 		* AIN3 - Alternator Voltage Divider 10K/3K3 (to measure over voltage)
 	* ADC2 Address 1001001b (Addr pin Vdd)
 		* AIN0 - Oil Pressure 0-5V Sensor
-		* AIN1 - Coolant 12V 1K Pullup
+		* AIN1 - Coolant, 1K Pullup to switched engine battery (J14.4), BAT46 clamp to 5V
 		* AIN2 - Engine Block, see below 
-		* AIN3 - Engine Battery, Voltage Divider 10K/4K7 Voltage Divider 10K/4K7
+		* AIN3 - Engine Battery (ignition-switched feed, J14.4), Voltage Divider 10K/4K7
 	* ADC3 Address 1001011b (Addr pin SCL)
 		* AIN0 - NTC4 10K NTC  5V 4K7 Pullup
 		* AIN1 - NTC5 10K NTC  5V 4K7 Pullup
@@ -273,7 +273,7 @@ Note that NMEA2000 message handling will be performed by the https://github.com/
 | Byte | Field Name | Data Type | Units / Resolution | Instance 0 (Engine Battery) | Instance 2 (Alternator) |
 | :---: | :--- | :--- | :--- | :--- | :--- |
 | 0 | Battery Instance | `uint8` | 1 | `0` | `2` |
-| 1–2 | Battery Voltage | `int16` | 0.01 V / bit | Engine battery voltage (ADC2 AIN3) | Alternator voltage (ADC1 AIN3) |
+| 1–2 | Battery Voltage | `int16` | 0.01 V / bit | Engine battery voltage (ADC2 AIN3, ignition-switched feed). `0x7FFF` (N/A) when below 3.0 V, i.e. ignition off. | Alternator voltage (ADC1 AIN3) |
 | 3–4 | Battery Current | `int16` | 0.1 A / bit | `0x7FFF` (N/A) | `0x7FFF` (N/A) |
 | 5–6 | Battery Temperature | `uint16` | 0.01 K / bit | `0xFFFF` (N/A) | **Alternator Temp** from NTC2 (ADC1 AIN1) |
 | 7 | Sequence ID (SID) | `uint8` | 1 | Rolling counter (0–255) | Rolling counter (0–255) |
